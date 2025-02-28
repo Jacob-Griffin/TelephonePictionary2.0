@@ -10,12 +10,12 @@ export const classic = new Theme({
   // If a color is not defined, it will simply fall back to the "base" theme's color
   styles: {
     colors: {
-      // active: 'white',
-      // brand: 'white',
+      active: '#8cc63f',
+      brand: '#2c33bf',
       // background: 'white',
       // backdrop: 'white',
       // border: 'white',
-      // button: 'white',
+      // button: 'var(--color-brand)',
       // disabled: 'white',
       // important: 'white',
       // scroll: 'white',
@@ -36,6 +36,7 @@ export const classic = new Theme({
     images: {
       // 'icon': "url('/example.png')",
       // 'small-icon': "url('/example.png')",
+      background: "url('/basic-bkgd.jpg')",
     },
   },
 });

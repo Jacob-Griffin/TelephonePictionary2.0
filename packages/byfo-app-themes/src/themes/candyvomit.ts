@@ -10,14 +10,14 @@ export const candyvomit = new Theme({
   // If a color is not defined, it will simply fall back to the "base" theme's color
   styles: {
     colors: {
-      // active: 'white',
-      // brand: 'white',
+      active: '#8a43db',
+      brand: '#f42f65',
       // background: 'white',
       // backdrop: 'white',
       // border: 'white',
       // button: 'white',
       // disabled: 'white',
-      // important: 'white',
+      important: '#ff9900',
       // scroll: 'white',
       // toggle: 'white',
     },
@@ -34,8 +34,9 @@ export const candyvomit = new Theme({
       // button: 'red',
     },
     images: {
-      // 'icon': "url('/example.png')",
+      icon: "url('/byfo-logo2.png')",
       // 'small-icon': "url('/example.png')",
+      background: "url('/candyCarnival-bkgd.jpg')",
     },
   },
 });

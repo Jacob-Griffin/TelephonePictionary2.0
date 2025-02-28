@@ -11,7 +11,7 @@ export const light = new Theme({
       background: '#f2f2f2',
       backdrop: 'rgba(210, 210, 210, 0.85)',
       border: 'rgb(100, 116, 139)',
-      button: 'rgb(60, 90, 190)',
+      button: 'var(--byfo-color-brand)',
       disabled: '#889',
       important: '#f28705',
       scroll: 'var(--byfo-text-main)',
