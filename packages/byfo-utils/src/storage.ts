@@ -1,4 +1,4 @@
-import { CustomTheme, ThemeId } from '@byfo/themes';
+import themes, { CustomTheme, ThemeId } from '@byfo/themes';
 import { RejoinData } from './Store';
 
 // Represents the store with the new and improved theme work
@@ -7,6 +7,9 @@ import { RejoinData } from './Store';
 export class BYFOStore {
   constructor() {
     this.readFromWindow();
+    this.customStyle.install();
+    this.themeController.install();
+    this.themeController.apply();
   }
 
   changeEvent = (setting: string, value: string) => new CustomEvent('tp-settings-changed', { detail: { setting, value } });
@@ -15,11 +18,16 @@ export class BYFOStore {
   setTheme = (v: ThemeId) => {
     localStorage.setItem('theme', v);
     this.theme = v;
+    this.themeController.install();
+    this.themeController.apply();
   };
+  get themeController() {
+    return themes[this.theme];
+  }
   customStyle: CustomTheme = CustomTheme.fromJsonString(localStorage.getItem('customStyle') ?? undefined);
-  setCustomStyle(v: CustomTheme) {
+  saveCustomStyle() {
+    // Not really a setter since custom style needs to be accessed for it to be responsive
     localStorage.setItem('customStyle', this.customStyle.toJsonString());
-    this.customStyle = v;
   }
   //#endregion theme
 
@@ -123,7 +131,8 @@ export class BYFOStore {
     if (theme) this.setTheme(theme);
     if (landscapeDismissed) this.setLandscapeDismissed(landscapeDismissed);
     if (!customStyle) return;
-    this.setCustomStyle(CustomTheme.fromJsonString(customStyle));
+    this.customStyle = CustomTheme.fromJsonString(customStyle);
+    this.saveCustomStyle();
   }
 
   clearGameData() {

@@ -2,19 +2,16 @@ import { css, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { html } from './src/utils/byfoHtml';
 import { ByfoIcon } from './src/components/functional/Icon';
-import type { Theme } from '@byfo/themes';
-import { themes, applicationRules } from '@byfo/themes';
-import { BYFOStore } from 'byfo-utils';
+import { installRootStyles } from '@byfo/themes';
+import { BYFOStore } from 'byfo-utils/storage';
 
+const store = new BYFOStore();
 @customElement('byfo-testpage')
 export default class BYFOTestpage extends LitElement {
-  store: BYFOStore = new BYFOStore();
   connectedCallback(): void {
     super.connectedCallback();
-    Object.values(themes).forEach((t: Theme) => t.install());
-    themes[this.store.theme].apply();
     if (this.shadowRoot) {
-      this.shadowRoot.adoptedStyleSheets = [...(this.shadowRoot?.adoptedStyleSheets ?? []), applicationRules];
+      installRootStyles(this.shadowRoot);
     }
   }
   formFields = [
@@ -34,7 +31,7 @@ export default class BYFOTestpage extends LitElement {
   render() {
     return html`<h1>BYFO Component test page</h1>
       <byfo-canvas backupKey=${'testkey'}></byfo-canvas>
-      <byfo-modal id='settings'><span slot="buttontext">${ByfoIcon('gear')}</span><byfo-settings slot="content" .store=${this.store}></byfo-settings></byfo-modal>
+      <byfo-modal id='settings'><span slot="buttontext">${ByfoIcon('gear')}</span><byfo-settings slot="content" .store=${store}></byfo-settings></byfo-modal>
       <byfo-modal
         ><span slot="buttontext">Hello!</span>
         <byfo-form slot='content' heading='Join Game' .onSubmit=${() => console.log('yippee!')} .fields=${this.formFields} buttonLabel='Join'></byfo-modal
@@ -43,6 +40,13 @@ export default class BYFOTestpage extends LitElement {
 
   static styles = [
     css`
+      :host {
+        box-sizing: border-box;
+      }
+      h1 {
+        margin-top: 0;
+        padding-top: 0.5em;
+      }
       #settings::part(openbutton) {
         position: fixed;
         top: 0;
@@ -58,5 +62,8 @@ export default class BYFOTestpage extends LitElement {
 declare global {
   interface HTMLElementTagNameMap {
     'byfo-testpage': BYFOTestpage;
+  }
+  interface Window {
+    byfoStore: BYFOStore;
   }
 }

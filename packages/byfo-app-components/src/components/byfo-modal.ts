@@ -1,5 +1,5 @@
 import { LitElement, css } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement } from '../utils/byfoCustomElement.ts';
 import { html } from '../utils/byfoHtml';
 
 import buttonStyles from '../styles/button.style.ts';

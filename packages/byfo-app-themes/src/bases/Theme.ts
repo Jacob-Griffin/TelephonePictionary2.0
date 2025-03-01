@@ -1,4 +1,5 @@
-import applicationRules from './applicationRules';
+import { installRootStyles } from './applicationRules';
+import { themeToString } from './themeToString';
 
 export class Theme {
   name: ThemeId;
@@ -41,46 +42,16 @@ export class Theme {
     this._sheet.replaceSync(this.toString());
   }
   toString() {
-    let result = this.isDefault ? ':root {' : `:root[byfo-theme-${this.name}] {`;
-    let { colors, textColors, hoverColors, images } = this.styles;
-    const extensions = [this, ...(this.themeExtends ?? [])].toReversed();
-    for (const source of extensions) {
-      colors = Object.assign({}, colors, source.styles.colors);
-      textColors = Object.assign({}, textColors, source.styles.textColors);
-      hoverColors = Object.assign({}, hoverColors, source.styles.hoverColors);
-      images = Object.assign({}, images, source.styles.images);
-    }
-    if (colors) {
-      for (const key in colors) {
-        result += `--byfo-color-${key}:${colors[key as keyof ThemeColors]};`;
-      }
-    }
-    if (textColors) {
-      for (const key in textColors) {
-        result += `--byfo-text-${key}:${textColors[key as keyof ThemeTextColors]};`;
-      }
-    }
-    if (hoverColors) {
-      for (const key in hoverColors) {
-        const value = hoverColors[key as keyof ThemeHoverColors];
-        const source = `--byfo-${colors && key in colors ? 'color' : 'text'}-${key}`;
-        result += `--byfo-hover-${key}:color-mix(in srgb, var(${source}), ${value});`;
-      }
-    }
-    if (images) {
-      for (const key in images) {
-        result += `--byfo-image-${key}:${images[key as keyof ThemeImages]};`;
-      }
-    }
-    result += '}';
-    return result;
+    const selector = this.isDefault ? '' : `[byfo-theme-${this.name}]`;
+    return `:root${selector} {${themeToString(this)}}`;
   }
   install() {
-    if (!window.backgroundSheet) {
-      window.backgroundSheet = applicationRules;
-      document.adoptedStyleSheets = [...document.adoptedStyleSheets, window.backgroundSheet];
-    }
+    installRootStyles(document);
     this.loadStylesheet();
+    if (document.adoptedStyleSheets.includes(this._sheet)) {
+      // Since it's all by reference, this should work to prevent duplicate sheets
+      return;
+    }
     document.adoptedStyleSheets = [...document.adoptedStyleSheets, this._sheet];
   }
   apply() {

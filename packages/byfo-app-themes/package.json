@@ -11,7 +11,7 @@
   "scripts": {
     "dev": "tsc --watch",
     "dev:components": "tsc --watch",
-    "build": "tsc",
+    "build": "tsc && node --import ./generator/dist-imports.node.js ./generator/build-default-css.node.js",
     "generate:theme": "node ./generator/generate-theme.node.js"
   },
   "devDependencies": {
