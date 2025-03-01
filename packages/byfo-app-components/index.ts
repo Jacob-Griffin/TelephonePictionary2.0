@@ -2,6 +2,7 @@ import { css, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { html } from './src/utils/byfoHtml';
 import { ByfoIcon } from './src/components/functional/Icon';
+import { ByfoMarkdown } from './src/components/functional/Markdown';
 import { installRootStyles } from '@byfo/themes';
 import { BYFOStore } from 'byfo-utils/storage';
 
@@ -28,6 +29,13 @@ export default class BYFOTestpage extends LitElement {
       validate: (v: string) => /\d{1,7}/.test(v),
     },
   ];
+  markdownContent = `## Hello World
+*Hello* **World**
+Testing the ***markdown **stuff** ***
+Including <script>console.error('uh oh');</script>,
+Links, [this](https://google.com) or <a href="google.com">this</a>
+### Mid-line headers
+and <style>p{color:red}</style>`;
   render() {
     return html`<h1>BYFO Component test page</h1>
       <byfo-canvas backupKey=${'testkey'}></byfo-canvas>
@@ -35,7 +43,8 @@ export default class BYFOTestpage extends LitElement {
       <byfo-modal
         ><span slot="buttontext">Hello!</span>
         <byfo-form slot='content' heading='Join Game' .onSubmit=${() => console.log('yippee!')} .fields=${this.formFields} buttonLabel='Join'></byfo-modal
-      >`;
+      >
+      <div>${ByfoMarkdown(this.markdownContent, true)}<div>`;
   }
 
   static styles = [

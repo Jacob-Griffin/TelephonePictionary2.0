@@ -28,6 +28,7 @@ export default css`
       Helvetica Neue,
       sans-serif;
     font-size: 16px;
+    color: var(--byfo-text-main);
   }
 
   body {
