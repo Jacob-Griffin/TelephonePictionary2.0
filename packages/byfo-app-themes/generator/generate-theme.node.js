@@ -83,7 +83,7 @@ export type { ThemeId, Theme };
 export * from './bases/ThemeSpec';
 export * from './bases/ThemeId';
 export { themes };
-export { default as applicationRules } from './bases/applicationRules';
+export { default as applicationRules, installRootStyles } from './bases/applicationRules';
 export default themes;
 `;
 
