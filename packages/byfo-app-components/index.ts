@@ -35,6 +35,12 @@ Testing the ***markdown **stuff** ***
 Including <script>console.error('uh oh');</script>,
 Links, [this](https://google.com) or <a href="google.com">this</a>
 ### Mid-line headers
+- Lists
+- Done
+- Normally
+  - and
+    - with
+  - depth
 and <style>p{color:red}</style>`;
   render() {
     return html`<h1>BYFO Component test page</h1>

@@ -1,86 +1,64 @@
 import { html, TemplateResult } from 'lit';
+import { parseByToken, Token, TokenType } from 'byfo-utils';
+import { map } from 'lit/directives/map.js';
 
-const splitter = '[{<<!>>}]';
-export function ByfoMarkdown(contentIn: string, withAdvanced?: boolean): TemplateResult {
-  const values: TemplateResult[] = [];
-  const cutReplacements = withAdvanced ? parseAdvanced(contentIn, values) : parseBasic(contentIn, values);
-  const template = Object.assign(
-    cutReplacements.map(seg => seg.replaceAll('<', '&lt;').replaceAll('>', '&gt;')),
-    { raw: cutReplacements },
-  );
-  return html(template, ...values);
+export function ByfoMarkdown(contentIn: string, withAdvanced?: boolean) {
+  const tokens = parseByToken(contentIn);
+  return renderTokens(tokens, withAdvanced);
 }
 
-function parseBasic(content: string, values: TemplateResult[]): string[] {
-  return content
-    .replaceAll(/(\*{1,3})(.+?)\1|\n/g, (m, stars: '*' | '**' | '***', t: string) => {
-      if (m === '\n') {
-        values.push(html`<br />`);
-        return splitter;
-      }
-      switch (stars.length) {
-        case 1:
-          values.push(html`<em>${t}</em>`);
-          break;
-        case 2:
-          values.push(html`<strong>${t}</strong>`);
-          break;
-        case 3:
-          values.push(html`<strong><em>${t}</em></strong>`);
-          break;
-      }
-      return splitter;
-    })
-    .split(splitter);
-}
-
-function parseAdvanced(content: string, values: TemplateResult[]): string[] {
-  return content
-    .replaceAll(/(?<stars>\*{1,3})(?<starcontent>.+?)\1|\n(?<h>#+) (?<hcontent>.+)\n|\[(?<linktext>[^\]]+)\]\((?<linklink>[^)]+)\)|\n/g, (m, ...others) => {
-      if (m === '\n') {
-        values.push(html`<br />`);
-        return splitter;
-      }
-      const { stars, starcontent, linktext, linklink, h, hcontent } = others.at(-1) ?? {};
-      if (stars) {
-        switch (stars.length) {
-          case 1:
-            values.push(html`<em>${starcontent}</em>`);
-            break;
-          case 2:
-            values.push(html`<strong>${starcontent}</strong>`);
-            break;
-          case 3:
-            values.push(html`<strong><em>${starcontent}</em></strong>`);
-            break;
-        }
-      }
-      if (linktext) {
-        values.push(html`<a href=${linklink}>${linktext}</a>`);
-      }
-      if (h) {
-        switch (h.length) {
-          case 1:
-            values.push(html`<h1>${hcontent}</h1>`);
-            break;
-          case 2:
-            values.push(html`<h2>${hcontent}</h2>`);
-            break;
-          case 3:
-            values.push(html`<h3>${hcontent}</h3>`);
-            break;
-          case 4:
-            values.push(html`<h4>${hcontent}</h4>`);
-            break;
-          case 5:
-            values.push(html`<h5>${hcontent}</h5>`);
-            break;
-          case 6:
-            values.push(html`<h6>${hcontent}</h6>`);
-            break;
-        }
-      }
-      return splitter;
-    })
-    .split(splitter);
+function renderTokens(tree: Token<TokenType | 'root'>, withAdvanced?: boolean): TemplateResult {
+  const strings = tree.children.map(v => (typeof v === 'string' ? html`${v}` : renderTokens(v, withAdvanced)));
+  const inner = html`${map(strings, v => (tree.type === 'root' ? html`${v}<br />` : v))}`;
+  if (tree.type === 'header') {
+    if (!withAdvanced) {
+      return html`${'#'.repeat(tree.meta as number)} ${inner}`;
+    }
+    switch (tree.meta) {
+      case 1:
+        return html`<h1>${inner}</h1>`;
+      case 2:
+        return html`<h2>${inner}</h2>`;
+      case 3:
+        return html`<h3>${inner}</h3>`;
+      case 4:
+        return html`<h4>${inner}</h4>`;
+      case 5:
+        return html`<h5>${inner}</h5>`;
+      case 6:
+        return html`<h6>${inner}</h6>`;
+      default:
+        return html`<p>${inner}</p>`;
+    }
+  }
+  if (tree.type === 'link') {
+    if (!withAdvanced) {
+      return html`[${inner}](${tree.meta})`;
+    }
+    return html`<a href=${tree.meta}>${inner}</a>`;
+  }
+  if (tree.type === 'list') {
+    if (!withAdvanced) {
+      return html`${inner}`;
+    }
+    return html`<ul>
+      ${inner}
+    </ul>`;
+  }
+  if (tree.type === 'listitem') {
+    const tok = tree as Token<'listitem'>;
+    if (!withAdvanced) {
+      const tab = html`&nbsp;&nbsp;`;
+      const mapper = new Array(tok.parent.meta).fill(tab);
+      return html`${map(mapper, v => v)}- ${inner}<br />`;
+    }
+    return html`<li>${inner}</li>`;
+  }
+  if (tree.type === 'bold') {
+    return html`<strong>${inner}</strong>`;
+  }
+  if (tree.type === 'italic') {
+    return html`<em>${inner}</em>`;
+  }
+  return html`${inner}`;
 }
