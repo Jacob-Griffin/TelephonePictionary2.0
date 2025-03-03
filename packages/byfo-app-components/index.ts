@@ -3,6 +3,7 @@ import { customElement } from 'lit/decorators.js';
 import { html } from './src/utils/byfoHtml';
 import { ByfoIcon } from './src/components/functional/Icon';
 import { ByfoMarkdown } from './src/components/functional/Markdown';
+import { ByfoCard, cardStyles } from './src/components/functional/Card';
 import { installRootStyles } from '@byfo/themes';
 import { BYFOStore } from 'byfo-utils/storage';
 
@@ -47,9 +48,13 @@ and <style>p{color:red}</style>`;
       <byfo-canvas backupKey=${'testkey'}></byfo-canvas>
       <byfo-modal id='settings'><span slot="buttontext">${ByfoIcon('gear')}</span><byfo-settings slot="content" .store=${store}></byfo-settings></byfo-modal>
       <byfo-modal
-        ><span slot="buttontext">Hello!</span>
+        ><span slot="buttontext">Form Test</span>
         <byfo-form slot='content' heading='Join Game' .onSubmit=${() => console.log('yippee!')} .fields=${this.formFields} buttonLabel='Join'></byfo-modal
       >
+      <byfo-modal>
+        <span slot="buttontext">Card Test</span>
+        <div slot='content'>${ByfoCard('# Example of a card\nWith advanced [markdown](stuff) and *basic* **too**\n- test', 'text', 'Jacob', 'right')}</div>
+      </byfo-modal>
       <div>${ByfoMarkdown(this.markdownContent, true)}<div>`;
   }
 
@@ -71,6 +76,7 @@ and <style>p{color:red}</style>`;
         border-radius: 0 0 0 1rem;
       }
     `,
+    cardStyles,
   ];
 }
 
