@@ -15,6 +15,21 @@ export class ByfoAppPage extends LitElement {
     installRootStyles(this.shadowRoot!);
   }
 
+  #redirect(route: string, arg?: string) {
+    const routeObj = routes[route];
+    if (!routeObj) {
+      return;
+    }
+    this.route = route;
+    this.routeArg = arg;
+    if (this.loaded) {
+      window.history.pushState({}, '', routeObj.renderUrl(arg));
+    }
+    if (routeObj.title) {
+      document.title = routeObj.title + ' | Blow Your Face Off';
+    }
+  }
+
   #fetchRoute() {
     const p = window.location.pathname;
     let route: RouteResult = {};
@@ -25,18 +40,23 @@ export class ByfoAppPage extends LitElement {
       }
     }
     if (route.route) {
-      this.route = route.route;
-      this.routeArg = route.routeArg;
+      this.#redirect(route.route, route.routeArg);
+      this.loaded = true;
+    } else {
+      this.route = 'home';
+      window.history.replaceState({}, '', '/');
     }
   }
 
   store = new BYFOStore();
+  loaded: boolean = false;
 
   @state() route?: string;
   @state() routeArg?: string;
 
   render() {
-    return html`<section class=${this.route !== 'home' ? 'header invisible' : 'header'}>
+    return html`<section class=${this.route === 'home' ? 'header invisible' : 'header'}>
+        <div id="small-logo"></div>
         <byfo-modal id="settings"><span slot="buttontext">${ByfoIcon('gear')}</span><byfo-settings slot="content" .store=${this.store}></byfo-settings></byfo-modal>
       </section>
       <main>${choose(this.route, routeMap, () => html``)}</main>`;
@@ -44,6 +64,7 @@ export class ByfoAppPage extends LitElement {
 
   static styles = css`
     :host {
+      --header-size: 4.5rem;
       width: 100%;
       height: 100vh;
       overflow-y: auto;
@@ -52,22 +73,38 @@ export class ByfoAppPage extends LitElement {
       display: block;
     }
     .header {
-      height: 4rem;
+      height: var(--header-size);
       background-color: var(--byfo-color-brand);
     }
 
     .invisible {
+      background-color: transparent;
       #settings::part(openbutton) {
         border-radius: 0 0 0 1rem;
       }
+      #small-logo {
+        display: none;
+      }
+    }
+
+    #small-logo {
+      position: fixed;
+      width: 100vw;
+      top: 0;
+      inset-inline: 0;
+      height: var(--header-size);
+      background-image: var(--byfo-image-small-icon);
+      background-position: center;
+      background-size: contain;
+      background-repeat: no-repeat;
     }
 
     #settings::part(openbutton) {
       position: fixed;
       top: 0;
       right: 0;
-      width: 4rem;
-      height: 4rem;
+      width: var(--header-size);
+      height: var(--header-size);
       box-sizing: border-box;
       padding: 0.75rem;
       border-radius: 0;

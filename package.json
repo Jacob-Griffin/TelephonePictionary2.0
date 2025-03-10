@@ -8,6 +8,7 @@
     "dev": "turbo run dev --parallel",
     "dev:rebuild": "turbo run build && turbo run dev --parallel",
     "dev:components": "turbo run dev:components --parallel",
+    "dev:lit": "turbo run dev:lit --parallel",
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "release": "node ./release.node.mjs",

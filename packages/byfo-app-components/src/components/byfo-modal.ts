@@ -34,7 +34,7 @@ export default class BYFOModal extends LitElement {
 
   render() {
     return html`<button @click=${this.openModal} part="openbutton"><slot name="buttontext"></slot></button>
-      <dialog ${ref(this.#dialog)} @click=${this.backdropCloseModal}>
+      <dialog ${ref(this.#dialog)} @click=${this.backdropCloseModal} part="dialog">
         <button @click=${this.closeModal} class="close-button">${ByfoIcon('x')}</button><slot name="content"></slot>
       </dialog>`;
   }

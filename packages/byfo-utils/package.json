@@ -15,6 +15,7 @@
   "scripts": {
     "dev": "tsc --watch",
     "dev:components": "tsc --watch",
+    "dev:lit": "tsc --watch",
     "build": "tsc",
     "test": "vitest"
   },

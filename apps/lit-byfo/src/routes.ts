@@ -2,7 +2,7 @@ import { html, TemplateResult } from 'lit';
 
 export type RouteResult = { route?: string; routeArg?: string };
 
-export const routes: Record<string, { match: (p: string) => RouteResult; render: () => TemplateResult }> = {
+export const routes: Record<string, { match: (p: string) => RouteResult; render: () => TemplateResult; renderUrl: (arg?: string) => string; title?: string }> = {
   home: {
     match: p => {
       return p === '/' ? { route: 'home' } : {};
@@ -13,6 +13,8 @@ export const routes: Record<string, { match: (p: string) => RouteResult; render:
       }
       return html`<byfo-app-home></byfo-app-home>`;
     },
+    renderUrl: () => '/',
+    title: 'Home',
   },
 };
 export const routeMap = Object.entries(routes).map(([key, val]) => [key, val.render]) as [keyof typeof routes, () => TemplateResult][];

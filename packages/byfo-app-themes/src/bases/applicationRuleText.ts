@@ -43,6 +43,7 @@ export default css`
   h5,
   h6 {
     color: var(--byfo-text-heading);
+    font-weight: normal;
   }
 
   p {
@@ -88,6 +89,14 @@ export default css`
   footer {
     background-color: var(--byfo-color-brand);
     color: var(--byfo-text-brand);
+  }
+
+  input,
+  select {
+    background-color: var(--byfo-color-background);
+    color: var(--byfo-text-main);
+    border: solid 1px var(--byfo-color-border);
+    border-radius: 0.5rem;
   }
 
   ::-webkit-scrollbar {
