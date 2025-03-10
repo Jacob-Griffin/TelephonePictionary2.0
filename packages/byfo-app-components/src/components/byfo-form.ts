@@ -1,9 +1,9 @@
 import { LitElement, PropertyValues, css } from 'lit';
 import { property, state } from 'lit/decorators.js';
-import { customElement } from '../utils/byfoCustomElement.ts';
+import { customElement } from '../utils/byfoCustomElement';
 import { html } from '../utils/byfoHtml';
 
-import buttonStyles from '../styles/button.style.ts';
+import buttonStyles from '../styles/button.style';
 import { applicationRules } from '@byfo/themes';
 import { map } from 'lit/directives/map.js';
 

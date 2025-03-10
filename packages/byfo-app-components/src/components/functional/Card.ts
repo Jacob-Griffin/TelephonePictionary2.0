@@ -15,6 +15,12 @@ export const cardStyles = css`
     color: var(--byfo-text-backdrop);
     border-radius: 1rem;
     padding: 0.75rem 1rem 0;
+    & > img {
+      max-width: 50rem;
+      aspect-ratio: 5 / 3;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+    }
     .name-tag {
       position: absolute;
       left: 0.5rem;

@@ -1,14 +1,14 @@
 import { LitElement, PropertyValues, css, nothing } from 'lit';
 import { property, state } from 'lit/decorators.js';
-import { customElement } from '../utils/byfoCustomElement.ts';
+import { customElement } from '../utils/byfoCustomElement';
 import { createRef, ref, Ref } from 'lit/directives/ref.js';
 import { html } from '../utils/byfoHtml';
 import { BYFOCanvasState } from 'byfo-utils';
 import { map } from 'lit/directives/map.js';
 
-import { ByfoIcon } from './functional/Icon.ts';
+import { ByfoIcon } from './functional/Icon';
 
-import buttonStyles from '../styles/button.style.ts';
+import buttonStyles from '../styles/button.style';
 import { applicationRules } from '@byfo/themes';
 
 const internalWidth = 1000;

@@ -7,7 +7,7 @@
     "build:utils": "turbo run --filter byfo-utils build",
     "dev": "turbo run dev --parallel",
     "dev:rebuild": "turbo run build && turbo run dev --parallel",
-    "dev:components": "turbo run dev:components --parallel", 
+    "dev:components": "turbo run dev:components --parallel",
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "release": "node ./release.node.mjs",
@@ -29,5 +29,5 @@
     "turbo": "^2.4.0",
     "typescript-eslint": "^8.22.0"
   },
-  "packageManager": "pnpm@10.1.0"
+  "packageManager": "pnpm@10.6.2"
 }

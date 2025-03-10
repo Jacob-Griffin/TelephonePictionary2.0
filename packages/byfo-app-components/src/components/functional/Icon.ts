@@ -130,7 +130,7 @@ export const icons = {
 export function ByfoIcon(icon: Icon, prop?: string): TemplateResult | null {
   if (icon in icons) {
     if (typeof icons[icon] === 'function') {
-      return icons[icon](prop);
+      return html`<byfo-icon>${icons[icon](prop)}</byfo-icon>`;
     }
     return html`<byfo-icon>${icons[icon]}</byfo-icon>`;
   }

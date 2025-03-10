@@ -1,19 +1,23 @@
 import { config as defaultConfig, BYFOConfig } from './config';
 import { BYFOFirebaseAdapter, RoundContent, RoundData, StaticRoundInfo } from './firebase';
-import { validGameId, validUsername } from './general';
+import { isValidGameId, isValidUsername } from './general';
 import { useAccessor } from './accessors';
 
 export class BYFOGameState {
   #firebase: BYFOFirebaseAdapter;
   constructor(firebase?: BYFOFirebaseAdapter, gameid?: number | string, self?: string) {
     this.#config = Object.assign({}, defaultConfig, firebase?.gameConfig ?? {});
-    if (!validGameId(gameid.toString())) {
+    if (!isValidGameId(gameid.toString())) {
       this.#error = new Error(`Game error: invalid gameid ${gameid}`);
       return;
     }
-    const usernameError = validUsername(self, this.config.usernameMaxCharacters);
-    if (typeof usernameError === 'string') {
-      this.#error = new Error(usernameError);
+    try {
+      const valid = isValidUsername(self, this.config.usernameMaxCharacters);
+      if (!valid) {
+        return;
+      }
+    } catch (e) {
+      this.#error = e;
       return;
     }
 
@@ -41,7 +45,7 @@ export class BYFOGameState {
     }
   }
 
-  #gameplayHandles: { clearAll: () => void } & Record<string, number | (() => void) | NodeJS.Timeout> = {
+  #gameplayHandles: { clearAll: () => void } & Record<string, number | (() => void)> = {
     clearAll: () => {
       Object.values(this.#gameplayHandles).forEach(handle => {
         if (typeof handle === 'function') {

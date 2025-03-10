@@ -1,4 +1,4 @@
-import './components/byfo-modal.ts';
-import './components/byfo-canvas.ts';
-import './components/byfo-form.ts';
-import './components/byfo-settings.ts';
+import './components/byfo-modal';
+import './components/byfo-canvas';
+import './components/byfo-form';
+import './components/byfo-settings';

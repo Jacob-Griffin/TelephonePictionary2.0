@@ -1,10 +1,10 @@
 import { LitElement, css } from 'lit';
-import { customElement } from '../utils/byfoCustomElement.ts';
+import { customElement } from '../utils/byfoCustomElement';
 import { html } from '../utils/byfoHtml';
 
-import buttonStyles from '../styles/button.style.ts';
+import buttonStyles from '../styles/button.style';
 import { applicationRules } from '@byfo/themes';
-import { ByfoIcon } from './functional/Icon.ts';
+import { ByfoIcon } from './functional/Icon';
 import { createRef, ref, Ref } from 'lit/directives/ref.js';
 
 @customElement('byfo-modal')

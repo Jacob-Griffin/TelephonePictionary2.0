@@ -1,10 +1,10 @@
 import { LitElement, css } from 'lit';
 import { property } from 'lit/decorators.js';
-import { customElement } from '../utils/byfoCustomElement.ts';
+import { customElement } from '../utils/byfoCustomElement';
 import { map } from 'lit/directives/map.js';
 import { html } from '../utils/byfoHtml';
 
-import buttonStyles from '../styles/button.style.ts';
+import buttonStyles from '../styles/button.style';
 import { applicationRules, CustomTheme, ThemeId, themes } from '@byfo/themes';
 import { BYFOStore } from 'byfo-utils';
 import { createRef, ref, Ref } from 'lit/directives/ref.js';
