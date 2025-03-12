@@ -19,7 +19,7 @@ import { when } from 'lit/directives/when.js';
 export class BYFOForm extends LitElement {
   @property() heading?: string;
   @property() fields?: Field[];
-  @property() onSubmit?: (fieldValues: Record<string, string>) => void;
+  @property() onSubmit?: (fieldValues: Record<string, string>) => void | Promise<void>;
   @property() buttonLabel?: string;
   @state() submissionDisabled: boolean = true;
   @state() error?: string;
@@ -49,9 +49,21 @@ export class BYFOForm extends LitElement {
     this.submissionDisabled = Object.values(this.valid).some(v => !v);
   };
 
+  catchSubmitError = (e: Error) => {
+    const { message } = e;
+    this.error = message;
+    setTimeout(() => {
+      if (this.error === message) this.error = undefined;
+    }, 3000);
+  };
+
   submit() {
     if (Object.values(this.valid).every(v => v)) {
-      this.onSubmit?.(this.values);
+      try {
+        this.onSubmit?.(this.values)?.catch(this.catchSubmitError);
+      } catch (e) {
+        this.catchSubmitError(e as Error);
+      }
     }
   }
 

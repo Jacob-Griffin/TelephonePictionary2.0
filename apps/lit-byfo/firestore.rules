@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents/games {
+    match /{gameid} {
+      allow write: if gameid.matches('[0-9]{1,6}') && !exists(/databases/$(database)/documents/games/$(gameid));
+      allow read;
+    }
+  }
+  match /databases/{database}/documents/metadata {
+    match /{gameid} {
+      allow write: if gameid.matches('[0-9]{1,6}') && !exists(/databases/$(database)/documents/metadata/$(gameid));
+      allow read;
+    }
+  }
+  match /databases/{database}/documents/search {
+    match /{gameid} {
+      allow write: if gameid.matches('[0-9]{1,6}') && !exists(/databases/$(database)/documents/search/$(gameid));
+      allow read;
+    }
+  }
+}

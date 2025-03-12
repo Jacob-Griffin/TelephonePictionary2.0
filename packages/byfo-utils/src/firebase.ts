@@ -1,6 +1,6 @@
-import { setDoc, doc, getDocFromServer, getFirestore, type Firestore } from 'firebase/firestore';
-import { ref as rtdbRef, get, set, onValue, remove, getDatabase, onDisconnect, DataSnapshot, type Database } from 'firebase/database';
-import { getDownloadURL, ref as storageRef, uploadBytes, getStorage, type FirebaseStorage } from 'firebase/storage';
+import { setDoc, doc, getDocFromServer, getFirestore, type Firestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { ref as rtdbRef, get, set, onValue, remove, getDatabase, onDisconnect, DataSnapshot, type Database, connectDatabaseEmulator } from 'firebase/database';
+import { getDownloadURL, ref as storageRef, uploadBytes, getStorage, type FirebaseStorage, connectStorageEmulator } from 'firebase/storage';
 import { FirebaseOptions, initializeApp } from 'firebase/app';
 import { BYFOConfig, config as defaultGameConfig } from './config';
 import { decodePath, encodePath, validUsername } from './general';
@@ -58,6 +58,12 @@ export class BYFOFirebaseAdapter {
     this.connection.db = getFirestore(app);
     this.connection.rtdb = getDatabase(app);
     this.connection.storage = getStorage(app);
+    if (location.hostname === 'localhost') {
+      console.log('Connecting to firebase emulators');
+      connectDatabaseEmulator(this.connection.rtdb, '127.0.0.1', 9000);
+      connectFirestoreEmulator(this.connection.db, '127.0.0.1', 8080);
+      connectStorageEmulator(this.connection.storage, '127.0.0.1', 5000);
+    }
     this.gameConfig = Object.assign({}, defaultGameConfig, gameConfig);
     if (internetTime) {
       this.syncTimer();
@@ -277,7 +283,7 @@ export class BYFOFirebaseAdapter {
    * @returns An object pairing gameids to statuses
    */
   async listGameStatus(): Promise<{ [id: number]: GameStatus }> {
-    return this.getRef('game-statuses');
+    return (await this.getRef('game-statuses')) ?? {};
   }
 
   async createGame(user: string): Promise<string | false> {

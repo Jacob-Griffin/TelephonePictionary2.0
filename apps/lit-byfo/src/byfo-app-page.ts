@@ -6,6 +6,7 @@ import { installRootStyles } from '@byfo/themes';
 import { BYFOStore } from 'byfo-utils/storage';
 import { ByfoIcon } from '@byfo/components/functional';
 import '@byfo/components/all';
+import { BYFOFirebaseAdapter } from 'byfo-utils';
 
 @customElement('byfo-app-page')
 export class ByfoAppPage extends LitElement {
@@ -13,6 +14,7 @@ export class ByfoAppPage extends LitElement {
     super.connectedCallback();
     this.#fetchRoute();
     installRootStyles(this.shadowRoot!);
+    window.addEventListener('popstate', () => this.#fetchRoute());
   }
 
   #redirect(route: string, arg?: string) {
@@ -48,7 +50,17 @@ export class ByfoAppPage extends LitElement {
     }
   }
 
+  handleRedirect = ({ detail }: HTMLElementEventMap['byforedirect']) => {
+    this.#redirect(detail.route, detail.arg);
+  };
+
   store = new BYFOStore();
+  firebase = new BYFOFirebaseAdapter(__FIREBASE_CONFIG__, {}, true);
+  provides = {
+    store: this.store,
+    firebase: this.firebase,
+    getRoute: () => ({ route: this.route, arg: this.routeArg }),
+  };
   loaded: boolean = false;
 
   @state() route?: string;
@@ -59,7 +71,7 @@ export class ByfoAppPage extends LitElement {
         <div id="small-logo"></div>
         <byfo-modal id="settings"><span slot="buttontext">${ByfoIcon('gear')}</span><byfo-settings slot="content" .store=${this.store}></byfo-settings></byfo-modal>
       </section>
-      <main>${choose(this.route, routeMap, () => html``)}</main>`;
+      <main @byforedirect=${this.handleRedirect}>${choose(this.route, routeMap, () => html``)}</main>`;
   }
 
   static styles = css`
@@ -116,4 +128,10 @@ declare global {
   interface HTMLElementTagNameMap {
     'byfo-app-page': ByfoAppPage;
   }
+  interface HTMLElementEventMap {
+    byforedirect: CustomEvent<{ route: string; arg?: string }>;
+  }
 }
+
+declare const __FIREBASE_CONFIG__: ConstructorParameters<typeof BYFOFirebaseAdapter>[0];
+declare const __BUILD_DATE__: { year: number; full: string; date: Date };

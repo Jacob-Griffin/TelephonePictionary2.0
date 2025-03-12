@@ -2,48 +2,59 @@ import { installRootStyles } from '@byfo/themes';
 import { LitElement, css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import type { Field } from '@byfo/components';
-import { isValidGameId, isValidUsername, type BYFOStore } from 'byfo-utils';
+import { isValidGameId, isValidUsername } from 'byfo-utils';
+import { useInjection } from '../utils/use-injection';
 
+type FormType = 'join' | 'host' | 'review' | 'search';
+type Form = { action: (v: Record<string, string>) => void; fields: Field[] };
+type FormMap = Record<FormType, Form>;
 @customElement('byfo-app-home')
 export class ByfoAppHome extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
     installRootStyles(this.shadowRoot!);
-    this.store = this.closest('byfo-app-page')?.store;
+    this.forms = this.createForms();
   }
 
-  store?: BYFOStore;
+  injected = useInjection(this, ['store', 'firebase']);
 
-  forms: Record<'join' | 'host' | 'review' | 'search', { action: (v: Record<string, string>) => void; fields: Field[] }> = {
+  forms?: FormMap;
+  createForms: () => FormMap = () => ({
     join: {
-      action: values => {
-        console.log(values);
+      action: async values => {
+        const response = await this.injected.firebase!.addPlayerToLobby(~~values.gameid, values.username);
+        if (response.action === 'error') {
+          throw new Error(response.detail);
+        }
       },
       fields: [
         {
           label: 'Name',
           id: 'username',
           validate: isValidUsername,
-          initial: this.store?.username ?? '',
+          initial: this.injected.store?.username ?? '',
         },
         {
           label: 'Game ID',
           id: 'gameid',
           validate: isValidGameId,
-          initial: this.store?.gameid ?? '',
+          initial: this.injected.store?.gameid ?? '',
         },
       ],
     },
     host: {
-      action: values => {
-        console.log(values);
+      action: async values => {
+        const id = await this.injected.firebase?.createGame(values.username);
+        if (id) {
+          this.dispatchEvent(new CustomEvent('byforedirect', { detail: { route: 'lobby', arg: id }, bubbles: true }));
+        }
       },
       fields: [
         {
           label: 'Name',
           id: 'username',
           validate: isValidUsername,
-          initial: this.store?.username ?? '',
+          initial: this.injected.store?.username ?? '',
         },
       ],
     },
@@ -56,7 +67,7 @@ export class ByfoAppHome extends LitElement {
           label: 'Game ID',
           id: 'gameid',
           validate: isValidGameId,
-          initial: this.store?.gameid ?? '',
+          initial: this.injected.store?.gameid ?? '',
         },
       ],
     },
@@ -72,9 +83,12 @@ export class ByfoAppHome extends LitElement {
         },
       ],
     },
-  };
+  });
 
   render() {
+    if (!this.forms) {
+      this.forms = this.createForms();
+    }
     return html`<div id="icon-row">
         <div id="icon-spacer"></div>
         <div id="main-icon"></div>

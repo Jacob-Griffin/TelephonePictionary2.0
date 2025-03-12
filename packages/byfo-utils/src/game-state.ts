@@ -35,13 +35,13 @@ export class BYFOGameState {
   async initialize() {
     const status = await this.#firebase.getGameStatus(this.#gameid);
     if (!status) {
-      throw new GameStateError('pre-game');
+      throw new GameStateError('home');
     } else if (status.started) {
       return await this.initializeGameplay();
     } else if (status.finished) {
-      throw new GameStateError('post-game');
+      throw new GameStateError('review', this.#gameid.toString());
     } else {
-      throw new GameStateError('lobby');
+      throw new GameStateError('lobby', this.#gameid.toString());
     }
   }
 
@@ -65,7 +65,7 @@ export class BYFOGameState {
       initialRoundData = await this.#firebase.getRoundData(this.gameid);
     }
     if (!initialRoundData) {
-      throw new GameStateError('pre-game');
+      throw new GameStateError('home');
     }
     const host = await this.#firebase.getHost(this.gameid);
     this.#isHost = host === this.#self;
@@ -180,12 +180,14 @@ export class BYFOGameState {
   //#endregion
 }
 
-type Destination = 'pre-game' | 'lobby' | 'game' | 'post-game';
-class GameStateError extends Error {
+type Destination = 'home' | 'lobby' | 'game' | 'review';
+export class GameStateError extends Error {
   type = 'StateError';
   destination: Destination;
-  constructor(destination: Destination) {
+  destinationArg?: string;
+  constructor(destination: Destination, destinationArg?: string) {
     super(`GameState error: global state is ${destination}`);
     this.destination = destination;
+    this.destinationArg = destinationArg;
   }
 }

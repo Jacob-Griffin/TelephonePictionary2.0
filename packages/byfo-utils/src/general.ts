@@ -1,5 +1,6 @@
+import type { BYFOStore } from './storage';
 import { config as defaultGameConfig } from './config';
-import { Player } from './firebase';
+import { type BYFOFirebaseAdapter, Player } from './firebase';
 
 export const stopPropagation = (e: Event) => e.stopPropagation();
 
@@ -196,4 +197,43 @@ export function useKeystrokes(map: Record<string, () => void>, logger?: (v: stri
       map[code]();
     }
   };
+}
+
+export function shadowClosest<T extends keyof HTMLElementTagNameMap>(root: Node, tagname: T): HTMLElementTagNameMap[T] | null {
+  if (!(root instanceof ShadowRoot)) {
+    root = root.getRootNode();
+  }
+  while (root instanceof ShadowRoot && root.host.tagName.toLowerCase() !== tagname.toLowerCase()) {
+    root = root.host.getRootNode();
+  }
+  if (root instanceof ShadowRoot && root.host.tagName.toLowerCase() === tagname.toLowerCase()) {
+    return root.host as HTMLElementTagNameMap[T];
+  }
+  if ((root as HTMLElement).tagName.toLowerCase() === tagname.toLowerCase()) {
+    return root as HTMLElementTagNameMap[T];
+  }
+  return null;
+}
+
+export function inject<T extends keyof BYFOInjectionSources>(root: Node, target: T): BYFOInjectionSources[T] | null {
+  if (!root.isConnected) {
+    return null;
+  }
+  if (!(root instanceof ShadowRoot)) {
+    root = root.getRootNode();
+  }
+  while (root instanceof ShadowRoot && !('provides' in root.host && target in (root.host.provides as BYFOInjectionSources))) {
+    root = root.host.getRootNode();
+  }
+  if (root instanceof ShadowRoot && 'provides' in root.host && target in (root.host.provides as BYFOInjectionSources)) {
+    return (root.host.provides as BYFOInjectionSources)[target];
+  }
+  throw new Error(`Injection failed, no provider exists in the shadow ancestry for "${target}"
+    Callee: ${root}`);
+}
+
+export interface BYFOInjectionSources {
+  store: BYFOStore;
+  firebase: BYFOFirebaseAdapter;
+  getRoute: () => { route: string; arg?: string };
 }
