@@ -18,6 +18,15 @@ export class ByfoAppHome extends LitElement {
 
   injected = useInjection(this, ['store', 'firebase']);
 
+  setGameVars = ({ gameid, username }: Record<string, string>) => {
+    if (gameid) {
+      this.injected.store?.setGameid(gameid);
+    }
+    if (username) {
+      this.injected.store?.setUsername(username);
+    }
+  };
+
   forms?: FormMap;
   createForms: () => FormMap = () => ({
     join: {
@@ -26,6 +35,8 @@ export class ByfoAppHome extends LitElement {
         if (response.action === 'error') {
           throw new Error(response.detail);
         }
+        this.setGameVars(values);
+        this.dispatchEvent(new CustomEvent('byforedirect', { detail: { route: response.dest, arg: values.gameid }, bubbles: true }));
       },
       fields: [
         {
@@ -46,6 +57,7 @@ export class ByfoAppHome extends LitElement {
       action: async values => {
         const id = await this.injected.firebase?.createGame(values.username);
         if (id) {
+          this.setGameVars({ ...values, gameid: id });
           this.dispatchEvent(new CustomEvent('byforedirect', { detail: { route: 'lobby', arg: id }, bubbles: true }));
         }
       },
@@ -59,8 +71,15 @@ export class ByfoAppHome extends LitElement {
       ],
     },
     review: {
-      action: values => {
-        console.log(values);
+      action: async values => {
+        const status = await this.injected.firebase?.getGameStatus(~~values.gameid);
+        if (!status) {
+          throw new Error(`Game ${values.gameid} does not exist`);
+        }
+        if (!status?.finished) {
+          throw new Error(`Game ${values.gameid} is not finished`);
+        }
+        this.dispatchEvent(new CustomEvent('byforedirect', { detail: { route: 'lobby', arg: values.gameid }, bubbles: true }));
       },
       fields: [
         {
@@ -116,14 +135,9 @@ export class ByfoAppHome extends LitElement {
   static styles = css`
     :host {
       display: block;
-    }
-    #test {
-      height: 5rem;
-      background-color: red;
-      width: var(--icon-offset);
+      width: 100%;
     }
     #icon-row {
-      margin-top: 5vh;
       height: 40vh;
       align-items: stretch;
       display: flex;

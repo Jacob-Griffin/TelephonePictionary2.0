@@ -193,6 +193,7 @@ export class BYFOFirebaseAdapter {
    *
    * @async
    * @external
+   * @deprecated This offloads the responsibility of "rejoining" to the frontend. Use `joinGame` instead
    */
   async addPlayerToLobby(gameid: number, username: string): Promise<ActionResponse> {
     //Grab the game status
@@ -222,6 +223,72 @@ export class BYFOFirebaseAdapter {
           return {
             action: 'join',
             detail: playerNumber,
+            dest: gameStatus.started ? 'game' : 'lobby',
+          };
+        }
+        if (!gameStatus.started) {
+          result.detail = 'Username already taken in game';
+          return result;
+        }
+      }
+      playerNumbers.add(parseInt(playerNumber));
+    }
+
+    if (gameStatus.started) {
+      result.detail = 'Game has already started';
+      return result;
+    }
+
+    if (playerNumbers.size > this.gameConfig.maxPlayers) {
+      result.detail = 'Too many players in game';
+      return result;
+    }
+
+    //If there are no issues, push in the new player
+    const newPlayerRef = this.ref(`players/${gameid}/${this.generatePriority(playerNumbers)}`);
+    set(newPlayerRef, { username, status: 'ready' });
+
+    return { action: 'lobby', dest: 'lobby' };
+  }
+
+  /**
+   * interface function to put a player into a given lobby
+   *
+   * @param gameid - Game to join
+   * @param username - User being added
+   * @returns An object describing the result of the request
+   *
+   * @async
+   * @external
+   */
+  async joinGame(gameid: number, username: string): Promise<ActionResponse> {
+    //Grab the game status
+    const gameStatus = await this.getRef(`game-statuses/${gameid}`);
+    const result: ActionResponse = {
+      action: 'error',
+    };
+    //If the game exists, read the data
+    if (!gameStatus) {
+      result.detail = 'Game does not exist';
+      return result;
+    }
+    if (gameStatus.finished) {
+      result.detail = 'Game has already finished';
+      return result;
+    }
+
+    //Check the players list
+    const players: PlayerList = await this.getWaitingPlayers(gameid);
+    const playerNumbers = new Set<number>();
+
+    // Check to make sure there isn't a rejoin or duplicate name
+    for (const playerNumber in players) {
+      const player = players[playerNumber];
+      if (player.username === username) {
+        if (player.status === 'missing') {
+          this.turnInMissing(gameid, ~~playerNumber);
+          return {
+            action: 'join',
             dest: gameStatus.started ? 'game' : 'lobby',
           };
         }
@@ -812,6 +879,7 @@ export interface Player {
 }
 
 export interface PlayerList {
+  __host: { username: string };
   [key: number]: Player;
 }
 

@@ -14,17 +14,17 @@ export class ByfoAppPage extends LitElement {
     super.connectedCallback();
     this.#fetchRoute();
     installRootStyles(this.shadowRoot!);
-    window.addEventListener('popstate', () => this.#fetchRoute());
+    window.addEventListener('popstate', () => this.#fetchRoute(true));
   }
 
-  #redirect(route: string, arg?: string) {
+  #redirect(route: string, arg?: string, fromWindow?: boolean) {
     const routeObj = routes[route];
     if (!routeObj) {
       return;
     }
     this.route = route;
     this.routeArg = arg;
-    if (this.loaded) {
+    if (this.loaded && !fromWindow) {
       window.history.pushState({}, '', routeObj.renderUrl(arg));
     }
     if (routeObj.title) {
@@ -32,7 +32,7 @@ export class ByfoAppPage extends LitElement {
     }
   }
 
-  #fetchRoute() {
+  #fetchRoute(fromWindow?: boolean) {
     const p = window.location.pathname;
     let route: RouteResult = {};
     for (const routeKey in routes) {
@@ -42,7 +42,7 @@ export class ByfoAppPage extends LitElement {
       }
     }
     if (route.route) {
-      this.#redirect(route.route, route.routeArg);
+      this.#redirect(route.route, route.routeArg, fromWindow);
       this.loaded = true;
     } else {
       this.route = 'home';
@@ -82,11 +82,13 @@ export class ByfoAppPage extends LitElement {
       overflow-y: auto;
       margin: 0;
       padding: 0;
-      display: block;
+      display: flex;
+      flex-direction: column;
     }
     .header {
       height: var(--header-size);
       background-color: var(--byfo-color-brand);
+      z-index: 100;
     }
 
     .invisible {
@@ -97,6 +99,18 @@ export class ByfoAppPage extends LitElement {
       #small-logo {
         display: none;
       }
+    }
+
+    main {
+      height: 100vh;
+      width: 100vw;
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
 
     #small-logo {

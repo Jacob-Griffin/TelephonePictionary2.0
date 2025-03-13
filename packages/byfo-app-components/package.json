@@ -7,6 +7,7 @@
     ".": "./dist/index.js",
     "./components": "./dist/components/index.js",
     "./utils": "./dist/utils/index.js",
+    "./styles": "./dist/styles/index.js",
     "./functional": "./dist/components/functional/index.js",
     "./all": "./dist/all-components.js"
   },

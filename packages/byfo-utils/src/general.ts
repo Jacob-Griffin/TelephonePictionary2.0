@@ -22,7 +22,9 @@ export function sortNames(names: string[]) {
  * @param sortKey - The object prop containing the name
  * @returns A sorted list of the objects
  */
-export function sortNamesBy<T extends { [key: string]: unknown }>(names: T[], sortKey: keyof T) {
+export function sortNamesBy<T extends { [key: string]: unknown }>(names: T[], sortKey: keyof T): typeof names;
+export function sortNamesBy(names: unknown[][], sortKey: number): typeof names;
+export function sortNamesBy<T extends { [key: string | number]: unknown }>(names: (Record<string, unknown> | unknown[])[], sortKey: string | number) {
   const keyMap = new Map<string, T>();
   const nameArray: string[] = [];
   names.forEach((obj: T) => {
@@ -235,5 +237,10 @@ export function inject<T extends keyof BYFOInjectionSources>(root: Node, target:
 export interface BYFOInjectionSources {
   store: BYFOStore;
   firebase: BYFOFirebaseAdapter;
-  getRoute: () => { route: string; arg?: string };
+  getRoute: () => RouteInfo;
+}
+
+export interface RouteInfo {
+  route: string;
+  arg?: string;
 }

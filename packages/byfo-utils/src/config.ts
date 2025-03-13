@@ -1,11 +1,20 @@
 export const config: BYFOConfig = {
   minPlayers: 3,
   maxPlayers: 20,
-  minRoundLength: 3, //Value in seconds
-  maxRoundLength: 20, //Value in minutes
+  /**
+   * The minimum round length in seconds
+   */
+  minRoundLength: 3,
+  /**
+   * The maximum round length in minutes
+   */
+  maxRoundLength: 20,
   textboxMaxCharacters: 280,
   usernameMaxCharacters: 32,
-  addTimeIncrement: 30, //Value in seconds
+  /**
+   * The amount of time to add when the host clicks "Add time" (in seconds)
+   */
+  addTimeIncrement: 30,
 };
 
 export interface BYFOConfig {

@@ -1,6 +1,6 @@
 import { css } from 'lit';
 
-export default css`
+export const buttonStyle = css`
   button {
     height: 2rem;
     border: none;
@@ -9,3 +9,5 @@ export default css`
     cursor: pointer;
   }
 `;
+
+export default buttonStyle;
