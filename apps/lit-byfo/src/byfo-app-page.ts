@@ -1,19 +1,19 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { RouteResult, routes, routeMap } from './routes';
+import { routes, routeMap } from './routes';
 import { choose } from 'lit/directives/choose.js';
 import { installRootStyles } from '@byfo/themes';
 import { BYFOStore } from 'byfo-utils/storage';
 import { ByfoIcon } from '@byfo/components/functional';
 import '@byfo/components/all';
-import { BYFOFirebaseAdapter } from 'byfo-utils';
+import { BYFOFirebaseAdapter, RedirectEventMap, RouteResult } from 'byfo-utils';
 
 @customElement('byfo-app-page')
 export class ByfoAppPage extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
-    this.#fetchRoute();
     installRootStyles(this.shadowRoot!);
+    this.#fetchRoute(true);
     window.addEventListener('popstate', () => this.#fetchRoute(true));
   }
 
@@ -24,7 +24,7 @@ export class ByfoAppPage extends LitElement {
     }
     this.route = route;
     this.routeArg = arg;
-    if (this.loaded && !fromWindow) {
+    if (!fromWindow) {
       window.history.pushState({}, '', routeObj.renderUrl(arg));
     }
     if (routeObj.title) {
@@ -34,23 +34,23 @@ export class ByfoAppPage extends LitElement {
 
   #fetchRoute(fromWindow?: boolean) {
     const p = window.location.pathname;
-    let route: RouteResult = {};
+    let route: RouteResult | {} = {};
     for (const routeKey in routes) {
       route = routes[routeKey].match(p);
-      if (route.route) {
+      if ('route' in route) {
         break;
       }
     }
-    if (route.route) {
-      this.#redirect(route.route, route.routeArg, fromWindow);
-      this.loaded = true;
+    if ('route' in route) {
+      this.#redirect(route.route, route.arg, fromWindow);
     } else {
-      this.route = 'home';
+      const [defaultRoute] = Object.entries(routes).find(([_, value]) => value.default) ?? ['home'];
+      this.route = defaultRoute;
       window.history.replaceState({}, '', '/');
     }
   }
 
-  handleRedirect = ({ detail }: HTMLElementEventMap['byforedirect']) => {
+  handleRedirect = ({ detail }: CustomEvent<RouteResult>) => {
     this.#redirect(detail.route, detail.arg);
   };
 
@@ -142,9 +142,7 @@ declare global {
   interface HTMLElementTagNameMap {
     'byfo-app-page': ByfoAppPage;
   }
-  interface HTMLElementEventMap {
-    byforedirect: CustomEvent<{ route: string; arg?: string }>;
-  }
+  interface HTMLElementEventMap extends RedirectEventMap {}
 }
 
 declare const __FIREBASE_CONFIG__: ConstructorParameters<typeof BYFOFirebaseAdapter>[0];

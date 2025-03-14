@@ -2,7 +2,7 @@ import { installRootStyles } from '@byfo/themes';
 import { LitElement, css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import type { Field } from '@byfo/components';
-import { isValidGameId, isValidUsername } from 'byfo-utils';
+import { emitRedirect, isValidGameId, isValidUsername } from 'byfo-utils';
 import { useInjection } from '../utils/use-injection';
 
 type FormType = 'join' | 'host' | 'review' | 'search';
@@ -36,7 +36,7 @@ export class ByfoAppHome extends LitElement {
           throw new Error(response.detail);
         }
         this.setGameVars(values);
-        this.dispatchEvent(new CustomEvent('byforedirect', { detail: { route: response.dest, arg: values.gameid }, bubbles: true }));
+        emitRedirect(this, { route: response.dest!, arg: values.gameid });
       },
       fields: [
         {
@@ -58,7 +58,7 @@ export class ByfoAppHome extends LitElement {
         const id = await this.injected.firebase?.createGame(values.username);
         if (id) {
           this.setGameVars({ ...values, gameid: id });
-          this.dispatchEvent(new CustomEvent('byforedirect', { detail: { route: 'lobby', arg: id }, bubbles: true }));
+          emitRedirect(this, { route: 'lobby', arg: id });
         }
       },
       fields: [
@@ -79,7 +79,7 @@ export class ByfoAppHome extends LitElement {
         if (!status?.finished) {
           throw new Error(`Game ${values.gameid} is not finished`);
         }
-        this.dispatchEvent(new CustomEvent('byforedirect', { detail: { route: 'lobby', arg: values.gameid }, bubbles: true }));
+        emitRedirect(this, { route: 'review', arg: values.gameid });
       },
       fields: [
         {
@@ -113,19 +113,19 @@ export class ByfoAppHome extends LitElement {
         <div id="main-icon"></div>
       </div>
       <section id="route-buttons">
-        <byfo-modal id="join" class="important"
+        <byfo-modal id="join" class="important big-button"
           ><span slot="buttontext">Join Game</span
           ><byfo-form slot="content" heading="Join a game" buttonLabel="Join" .fields=${this.forms.join.fields} .onSubmit=${this.forms.join.action}></byfo-form
         ></byfo-modal>
-        <byfo-modal id="host"
+        <byfo-modal id="host" class="big-button"
           ><span slot="buttontext">Host Game</span
           ><byfo-form slot="content" heading="Host a game" buttonLabel="Host" .fields=${this.forms.host.fields} .onSubmit=${this.forms.host.action}></byfo-form
         ></byfo-modal>
-        <byfo-modal id="review"
+        <byfo-modal id="review" class="big-button"
           ><span slot="buttontext">Review Finished Game</span
           ><byfo-form slot="content" heading="Review a finished game" buttonLabel="Review" .fields=${this.forms.review.fields} .onSubmit=${this.forms.review.action}></byfo-form
         ></byfo-modal>
-        <byfo-modal id="search"
+        <byfo-modal id="search" class="big-button"
           ><span slot="buttontext">Search Games</span
           ><byfo-form slot="content" heading="Search games" buttonLabel="Search" .fields=${this.forms.search.fields} .onSubmit=${this.forms.search.action}></byfo-form
         ></byfo-modal>
@@ -162,14 +162,6 @@ export class ByfoAppHome extends LitElement {
       gap: 1rem;
 
       byfo-modal {
-        &::part(openbutton) {
-          font-size: 1.5rem;
-          padding: 1rem;
-          height: 4rem;
-          width: 100vw;
-          max-width: 24rem;
-          border-radius: 1rem;
-        }
         &::part(dialog) {
           width: 40rem;
           max-width: 95vw;
@@ -180,14 +172,6 @@ export class ByfoAppHome extends LitElement {
       }
       .important::part(openbutton) {
         background-color: var(--byfo-color-important);
-      }
-
-      byfo-form::part(submit-button),
-      .search-button {
-        padding-inline: 1rem;
-        font-size: 1.5rem;
-        width: 80vw;
-        max-width: 15rem;
       }
     }
     h1 {

@@ -3,10 +3,10 @@ import { property, state } from 'lit/decorators.js';
 import { customElement } from '../utils/byfoCustomElement';
 import { html } from '../utils/byfoHtml';
 
-import buttonStyles from '../styles/button.style';
 import { applicationRules } from '@byfo/themes';
 import { map } from 'lit/directives/map.js';
 import { when } from 'lit/directives/when.js';
+import { buttonStyle, inputStyle } from '../styles/index';
 
 /**
  * Form element to handle inputs and validation
@@ -91,7 +91,7 @@ export class BYFOForm extends LitElement {
         )}
       </section>
       <p class="error">${this.error ?? ''}</p>
-      <button @click=${this.submit} ?disabled=${this.submissionDisabled} part="submit-button">${this.buttonLabel}</button>`;
+      <button class="big" @click=${this.submit} ?disabled=${this.submissionDisabled} part="submit-button">${this.buttonLabel}</button>`;
   }
 
   static styles = [
@@ -123,25 +123,17 @@ export class BYFOForm extends LitElement {
         justify-content: center;
         column-gap: var(--form-column-gap, 1rem);
         row-gap: var(--form-row-gap, 1rem);
-        input,
-        p {
-          box-sizing: border-box;
-          height: fit-content;
-          margin: 0;
-          font-size: 1.4rem;
-        }
-        input {
-          padding: 0.25rem;
-        }
       }
       p.error {
-        margin-block: calc(-1 * (var(--form-row-gap) / 2));
+        --error-height: calc(-1 * (var(--form-row-gap) / 2));
+        margin-block: var(--error-height);
       }
       input.span {
         grid-column: span 2;
       }
     `,
-    buttonStyles,
+    buttonStyle,
+    inputStyle,
     applicationRules,
   ];
 }

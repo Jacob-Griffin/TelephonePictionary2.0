@@ -1,6 +1,6 @@
 import type { BYFOStore } from './storage';
-import { config as defaultGameConfig } from './config';
-import { type BYFOFirebaseAdapter, Player } from './firebase';
+import { BYFOConfig, config as defaultGameConfig } from './config';
+import { type BYFOFirebaseAdapter, Player, PlayerList } from './firebase';
 
 export const stopPropagation = (e: Event) => e.stopPropagation();
 

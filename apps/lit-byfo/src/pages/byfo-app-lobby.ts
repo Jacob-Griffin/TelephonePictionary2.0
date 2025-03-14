@@ -2,8 +2,8 @@ import { installRootStyles } from '@byfo/themes';
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { useInjection } from '../utils/use-injection';
-import { PlayerList, RouteInfo } from 'byfo-utils';
-import { buttonStyle } from '@byfo/components/styles';
+import { emitRedirect, GameStatus, PlayerList, RouteInfo } from 'byfo-utils';
+import { buttonStyle, inputStyle } from '@byfo/components/styles';
 
 const nop = () => {};
 
@@ -14,6 +14,7 @@ export class ByfoAppLobby extends LitElement {
     installRootStyles(this.shadowRoot!);
     this.route = this.injected.getRoute!();
     this.unsubs.list = this.injected.firebase!.onPlayerListChange(~~this.route.arg!, this.onPlayerList) ?? nop;
+    this.unsubs.status = this.injected.firebase!.onGameStatusChange(~~this.route.arg!, this.onStatusChange) ?? nop;
   }
 
   disconnectedCallback(): void {
@@ -25,9 +26,10 @@ export class ByfoAppLobby extends LitElement {
 
   unsubs: Record<string, () => void> = {
     list: nop,
+    status: nop,
   };
 
-  @state() players?: PlayerList;
+  @state() players!: PlayerList;
   @state() showCopied: boolean = false;
   @state() canHost: boolean = false;
 
@@ -67,10 +69,9 @@ export class ByfoAppLobby extends LitElement {
   }
 
   checkHosting() {
-    const timeValid = this.time >= (this.config?.minRoundLength ?? 3) * 1000 && this.time <= (this.config?.maxRoundLength ?? 20) * 60000;
-    const playerList = Object.keys(this.players ?? {}).filter(key => key !== '__host');
-    const playerCountValid = playerList.length >= (this.config?.minPlayers ?? 3) && playerList.length <= (this.config?.maxPlayers ?? 20);
-    this.canHost = timeValid && playerCountValid && this.hosting;
+    const timeValid = !!this.injected.firebase?.isValidTime(this.time);
+    const playersValid = !!this.injected.firebase?.isValidPlayerList(this.players);
+    this.canHost = timeValid && playersValid && this.hosting;
   }
 
   onPlayerList = (list: PlayerList) => {
@@ -78,13 +79,29 @@ export class ByfoAppLobby extends LitElement {
     this.checkHosting();
   };
 
+  onStatusChange = ({ started }: GameStatus) => {
+    if (started) {
+      emitRedirect(this, { route: 'game', arg: this.route!.arg });
+    }
+  };
+
   handleTimeInput = (e: InputEvent) => {
     const value = (e.target as HTMLInputElement).value;
-    const { minutes, seconds } = value.match(/^(?:(?<minutes>\d+)m)(?:(?<seconds>\d+)s)$/)?.groups ?? {};
+    if (value === '') {
+      this.time = Number.POSITIVE_INFINITY;
+      return;
+    }
+    const { minutes, seconds }: Record<string, string | number> = value.match(/^(?:(?<minutes>\d+)m)?(?:(?<seconds>\d+)s)?$/)?.groups ?? {};
     if (!minutes && !seconds) {
       this.time = -1;
       return;
     }
+    if (minutes && ~~seconds >= 60) {
+      this.time = -1;
+      return;
+    }
+    const time = ~~seconds * 1000 + ~~minutes * 60000;
+    this.time = time;
   };
 
   startGame() {
@@ -113,7 +130,8 @@ export class ByfoAppLobby extends LitElement {
       <byfo-player-list .players=${this.players} .config=${this.config}></byfo-player-list>
       ${this.hosting
         ? html`<p>Round Length</p>
-            <input type="text" placeholder="∞" value="3m" @input=${this.handleTimeInput} ?disabled=${!this.canHost} />`
+            <input type="text" placeholder="∞" value="3m" @input=${this.handleTimeInput} />
+            <button class="big" @click=${this.startGame} ?disabled=${!this.canHost}>Start Game</button>`
         : nothing}`;
   }
 
@@ -131,11 +149,15 @@ export class ByfoAppLobby extends LitElement {
       .copied {
         back
       }
-      h2 {
+      h2, p {
         margin: 0;
+      }
+      input {
+        text-align: center;
       }
     `,
     buttonStyle,
+    inputStyle,
   ];
 }
 

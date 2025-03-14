@@ -66,6 +66,7 @@ export class BYFOFirebaseAdapter {
     }
     this.gameConfig = Object.assign({}, defaultGameConfig, gameConfig);
     if (internetTime) {
+      this.internetTime = true;
       this.syncTimer();
     } else {
       const offsetRef = rtdbRef(this.connection.rtdb, '.info/serverTimeOffset');
@@ -447,6 +448,7 @@ export class BYFOFirebaseAdapter {
    * @returns void
    */
   async beginGame(gameid: number, roundLength: number): Promise<void> {
+    if (roundLength === Number.POSITIVE_INFINITY) roundLength = -1;
     //Set up the round variable at 0
     const roundRef = this.ref(`game/${gameid}/round`);
     const round0 = {
@@ -593,7 +595,8 @@ export class BYFOFirebaseAdapter {
    * @deprecated
    */
   async resyncRoundData(gameid: number, callback: (snapshot: DataSnapshot) => unknown) {
-    get(this.ref(`/games/${gameid}/finished`)).then(result => callback(result));
+    await get(this.ref(`game/${gameid}/finished`)).then(result => callback(result));
+    return;
   }
 
   /**
@@ -602,7 +605,7 @@ export class BYFOFirebaseAdapter {
    * @returns The current round data
    */
   async getRoundData(gameid: number): Promise<RoundData> {
-    return await this.getRef(`/games/${gameid}/round`);
+    return await this.getRef(`game/${gameid}/round`);
   }
 
   /**
@@ -870,6 +873,30 @@ export class BYFOFirebaseAdapter {
     return getDownloadURL(imgref);
   }
   //#endregion
+
+  //#region validation
+  /**
+   * Determines if a given round length is valid
+   * @param input Round length in milliseconds
+   * @param config The game config object
+   * @returns true if the time is usable as a round length
+   */
+  isValidTime(input: number): boolean {
+    const { minRoundLength, maxRoundLength } = this.gameConfig;
+    if (input === Number.POSITIVE_INFINITY) {
+      return true;
+    }
+    if (input > maxRoundLength * 60000 || input < minRoundLength * 1000) {
+      return false;
+    }
+    return true;
+  }
+
+  isValidPlayerList(input: PlayerList): boolean {
+    const { minPlayers, maxPlayers } = this.gameConfig;
+    const playerCount = Object.keys(input).filter(key => key !== '__host').length;
+    return playerCount >= minPlayers && playerCount <= maxPlayers;
+  }
 }
 
 export interface Player {

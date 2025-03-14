@@ -24,22 +24,16 @@ export class BYFOGameState {
     this.#gameid = ~~gameid;
     this.#self = self;
     this.#firebase = firebase;
-
-    this.initialize().catch(e => {
-      if (e.type === 'StateError') {
-        throw e;
-      }
-    });
   }
 
   async initialize() {
     const status = await this.#firebase.getGameStatus(this.#gameid);
     if (!status) {
       throw new GameStateError('home');
-    } else if (status.started) {
-      return await this.initializeGameplay();
     } else if (status.finished) {
       throw new GameStateError('review', this.#gameid.toString());
+    } else if (status.started) {
+      return await this.initializeGameplay();
     } else {
       throw new GameStateError('lobby', this.#gameid.toString());
     }
@@ -75,11 +69,13 @@ export class BYFOGameState {
     this.players = await this.#firebase.fetchFinishedRounds(this.gameid);
 
     this.#gameplayHandles.timeChange = this.on('endtime', v => (this.currentTimeRemaining = v - this.#firebase.now));
-    await this.#handleRoundChange(initialRoundData);
     this.#gameplayHandles.time = setInterval(() => (this.currentTimeRemaining = this.endtime - this.#firebase.now), 500);
 
-    this.#gameplayHandles.roundChange = this.#firebase.onRoundChange(this.gameid, this.#handleRoundChange);
-    this.#gameplayHandles.whoFinishedChange = this.#firebase.onPlayerStatusChange(this.gameid, this.#handleStatusChange);
+    this.#gameplayHandles.roundChange = this.#firebase.onRoundChange(this.gameid, this.#handleRoundChange.bind(this));
+    this.#gameplayHandles.whoFinishedChange = this.#firebase.onPlayerStatusChange(this.gameid, this.#handleStatusChange.bind(this));
+
+    this.#staticRoundInfo = await this.#firebase.getStaticRoundInfo(this.gameid);
+    this.#initialized.resolve();
   }
 
   async #handleRoundChange(data: RoundData) {
@@ -101,6 +97,10 @@ export class BYFOGameState {
 
   async #handleStatusChange(data: Record<string, number>) {
     this.players = data;
+    if (!data) {
+      this.state = 'finished';
+      return;
+    }
     if (data[this.self] >= this.round) {
       this.state = 'waiting';
     }
@@ -111,8 +111,11 @@ export class BYFOGameState {
     this.state = 'finished';
   }
 
-  public async submitRound(data: string | Blob) {
+  public async submitRound(data?: string | Blob) {
     if (this.submitting) {
+      return;
+    }
+    if (!['writing', 'drawing'].includes(this.state)) {
       return;
     }
     this.submitting = true;
@@ -164,6 +167,11 @@ export class BYFOGameState {
   #error?: Error;
   get error() {
     return this.#error;
+  }
+
+  #initialized: PromiseWithResolvers<void> = Promise.withResolvers();
+  get initialized(): Promise<void> {
+    return this.#initialized.promise;
   }
   //#endregion
 

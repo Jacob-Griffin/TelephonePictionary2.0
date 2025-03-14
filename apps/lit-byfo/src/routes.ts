@@ -1,8 +1,7 @@
-import { html, TemplateResult } from 'lit';
+import { html } from 'lit';
+import { mapRoutes, type RouteList } from 'byfo-utils';
 
-export type RouteResult = { route?: string; routeArg?: string };
-
-export const routes: Record<string, { match: (p: string) => RouteResult; render: (arg?: string) => TemplateResult; renderUrl: (arg?: string) => string; title?: string }> = {
+export const routes: RouteList = {
   home: {
     match: p => {
       return p === '/' ? { route: 'home' } : {};
@@ -15,11 +14,12 @@ export const routes: Record<string, { match: (p: string) => RouteResult; render:
     },
     renderUrl: () => '/',
     title: 'Home',
+    default: true,
   },
   game: {
     match: p => {
-      const r = p.match(/\/game\/(\d{1,7})/);
-      return !!r ? { route: 'game', routeArg: r[1] } : {};
+      const r = p.match(/^\/game\/(\d{1,7})\/?$/);
+      return !!r ? { route: 'game', arg: r[1] } : {};
     },
     render: () => {
       if (!window.customElements.get('byfo-app-gameplay')) {
@@ -32,8 +32,8 @@ export const routes: Record<string, { match: (p: string) => RouteResult; render:
   },
   lobby: {
     match: p => {
-      const r = p.match(/\/lobby\/(\d{1,7})/);
-      return !!r ? { route: 'lobby', routeArg: r[1] } : {};
+      const r = p.match(/^\/lobby\/(\d{1,7})\/?$/);
+      return !!r ? { route: 'lobby', arg: r[1] } : {};
     },
     render: () => {
       if (!window.customElements.get('byfo-app-lobby')) {
@@ -44,5 +44,19 @@ export const routes: Record<string, { match: (p: string) => RouteResult; render:
     renderUrl: gameid => `/lobby/${gameid}`,
     title: 'Lobby',
   },
+  review: {
+    match: p => {
+      const r = p.match(/^\/review\/(\d{1,7})\/?$/);
+      return !!r ? { route: 'review', arg: r[1] } : {};
+    },
+    render: () => {
+      if (!window.customElements.get('byfo-app-review')) {
+        import('./pages/byfo-app-review.ts');
+      }
+      return html`<byfo-app-review></byfo-app-review>`;
+    },
+    renderUrl: gameid => `/review/${gameid}`,
+    title: 'review',
+  },
 };
-export const routeMap = Object.entries(routes).map(([key, val]) => [key, val.render]) as [keyof typeof routes, () => TemplateResult][];
+export const routeMap = mapRoutes(routes);

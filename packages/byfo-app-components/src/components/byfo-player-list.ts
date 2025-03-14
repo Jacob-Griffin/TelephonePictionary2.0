@@ -84,10 +84,11 @@ export default class BYFOPlayerList extends LitElement {
         display: grid;
         grid-template-columns: max-content;
         grid-auto-flow: row;
-        grid-auto-rows: 2rem;
+        grid-auto-rows: 2.25rem;
         p {
           margin: 0;
           height: fit-content;
+          font-size: 1.2rem;
         }
       }
       .info {
