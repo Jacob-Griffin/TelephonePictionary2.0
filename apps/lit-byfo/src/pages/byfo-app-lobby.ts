@@ -38,7 +38,7 @@ export class ByfoAppLobby extends LitElement {
   /**
    * Time per round (in milliseconds)
    */
-  #time: number = 30000;
+  #time: number = 180000;
   /**
    * Time per round (in milliseconds)
    */

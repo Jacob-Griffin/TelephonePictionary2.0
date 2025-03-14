@@ -188,7 +188,8 @@ export class BYFOCanvasState {
 
   backup: string;
 
-  on = useAccessor<BYFOCanvasState>(['backup', 'currentWidth', 'mode'], this);
+  accessorList: (keyof BYFOCanvasState)[] = ['backup', 'currentWidth', 'mode'];
+  on = useAccessor<BYFOCanvasState>(this);
 
   transformScreenPoint(e: { clientX: number; clientY: number }): [number, number] {
     const relativeX = e.clientX - this.#box.left;

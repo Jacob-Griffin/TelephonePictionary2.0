@@ -184,7 +184,8 @@ export class BYFOGameState {
   recievedCard?: RoundContent;
   submitting?: boolean;
 
-  on = useAccessor<BYFOGameState>(['round', 'currentTimeRemaining', 'endtime', 'players', 'recievedCard', 'state', 'submitting'], this);
+  accessorList: (keyof BYFOGameState)[] = ['round', 'currentTimeRemaining', 'endtime', 'players', 'recievedCard', 'state', 'submitting'];
+  on = useAccessor<BYFOGameState>(this);
   //#endregion
 }
 
