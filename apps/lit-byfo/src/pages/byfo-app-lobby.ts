@@ -147,9 +147,10 @@ export class ByfoAppLobby extends LitElement {
         justify-content: center;
       }
       .copied {
-        back
+        background-color: var(--byfo-color-active);
       }
-      h2, p {
+      h2,
+      p {
         margin: 0;
       }
       input {
