@@ -27,6 +27,14 @@ export class BYFOGameState {
   }
 
   async initialize() {
+    const prefetch = await this.#firebase.getRoundData(this.#gameid);
+    if (prefetch) {
+      if (prefetch.endTime > 0) {
+        this.endtime = prefetch.endTime;
+        this.timeTick();
+      }
+      return await this.initializeGameplay();
+    }
     const status = await this.#firebase.getGameStatus(this.#gameid);
     if (!status) {
       throw new GameStateError('home');
@@ -51,6 +59,21 @@ export class BYFOGameState {
     },
   };
 
+  timeTick = () => {
+    if (this.endtime < 0) {
+      return;
+    }
+    const t = this.endtime - this.#firebase.now;
+    if (t % 1000 > this.currentTimeRemaining % 1000) {
+      const min = Math.floor(t / 60000).toString();
+      const sec = Math.floor((t / 1000) % 60)
+        .toString()
+        .padStart(2, '0');
+      this.timeRemainingString = `${min}:${sec}`;
+    }
+    this.currentTimeRemaining = t;
+  };
+
   async initializeGameplay() {
     let retries = 3;
     let initialRoundData = await this.#firebase.getRoundData(this.gameid);
@@ -61,27 +84,20 @@ export class BYFOGameState {
     if (!initialRoundData) {
       throw new GameStateError('home');
     }
+
     const host = await this.#firebase.getHost(this.gameid);
     this.#isHost = host === this.#self;
     const { from, to } = await this.#firebase.getToAndFrom(this.gameid, this.self);
     this.#from = from;
     this.#to = to;
+
     this.players = await this.#firebase.fetchFinishedRounds(this.gameid);
-
-    this.#gameplayHandles.timeChange = this.on('endtime', v => (this.currentTimeRemaining = v - this.#firebase.now));
-    this.#gameplayHandles.time = setInterval(() => {
-      const t = this.endtime - this.#firebase.now;
-      if (t % 1000 > this.currentTimeRemaining % 1000) {
-        const min = Math.floor(t / 60000).toString();
-        const sec = Math.floor((t / 1000) % 60)
-          .toString()
-          .padStart(2, '0');
-        this.timeRemainingString = `${min}:${sec}`;
-      }
-      this.currentTimeRemaining = t;
-    }, 250);
-
     this.#gameplayHandles.roundChange = this.#firebase.onRoundChange(this.gameid, this.#handleRoundChange.bind(this));
+    if (initialRoundData.endTime > 0) {
+      this.#gameplayHandles.timeChange = this.on('endtime', v => (this.currentTimeRemaining = v - this.#firebase.now));
+      this.#gameplayHandles.time = setInterval(this.timeTick, 250);
+      this.timeTick();
+    }
     this.#gameplayHandles.whoFinishedChange = this.#firebase.onPlayerStatusChange(this.gameid, this.#handleStatusChange.bind(this));
 
     this.#staticRoundInfo = await this.#firebase.getStaticRoundInfo(this.gameid);

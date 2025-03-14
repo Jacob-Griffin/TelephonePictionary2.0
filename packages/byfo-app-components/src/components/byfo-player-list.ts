@@ -1,7 +1,7 @@
-import { css, LitElement, PropertyValues, TemplateResult } from 'lit';
+import { css, LitElement, nothing, PropertyValues, TemplateResult } from 'lit';
 import { customElement } from '../utils/byfoCustomElement';
 import { html } from '../utils/byfoHtml';
-import { BYFOConfig, sortNames, sortNamesBy, type PlayerList } from 'byfo-utils';
+import { BYFOConfig, decodePath, sortNames, sortNamesBy, type PlayerList } from 'byfo-utils';
 import { property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import backdropStyle from '../styles/backdrop.style';
@@ -11,6 +11,7 @@ export default class BYFOPlayerList extends LitElement {
   @property() players?: PlayerList;
   @property() statusMap?: Record<string, boolean>;
   @property() config?: BYFOConfig;
+  @property() countPlayers?: boolean;
 
   displayItems: TemplateResult[] = [];
 
@@ -22,7 +23,7 @@ export default class BYFOPlayerList extends LitElement {
           if (id === '__host') {
             continue;
           }
-          newlist.push(this.players[id].username);
+          newlist.push(decodePath(this.players[id].username));
         }
         this.displayItems = sortNames(newlist).map(n => html`<p>${n}</p>`);
       } else if (this.statusMap) {
@@ -30,7 +31,7 @@ export default class BYFOPlayerList extends LitElement {
         // TODO Sorting
         const sorted = sortNamesBy(Object.entries(this.statusMap), 0);
         for (const [name, ready] of sorted) {
-          newlist.push(html`<p>${name}</p>`);
+          newlist.push(html`<p>${decodePath(name)}</p>`);
           newlist.push(html`<p class=${ready ? 'ready' : 'waiting'}>${ready ? '✓' : '•'}</p>`);
         }
         this.displayItems = newlist;
@@ -59,13 +60,9 @@ export default class BYFOPlayerList extends LitElement {
     if (this.displayItems.length === 0) {
       return html`<section></section>`;
     }
-    if (this.players) {
-      const l = this.displayItems.length;
-      return html`<p class="info">Waiting for players. Invite players with the game number or by sharing the join link above</p>
-        ${this.renderPlayers()}
-        <p class="info">${l} player${l !== 1 ? 's' : ''} in game ${this.formatLimit()}</p>`;
-    }
-    return html`${this.renderPlayers()}`;
+    const l = this.displayItems.length;
+    return html`<p class="info"><slot name="pretext"></slot></p>
+      ${this.renderPlayers()} ${this.countPlayers ? html`<p class="info">${l} player${l !== 1 ? 's' : ''} in game ${this.formatLimit()}</p>` : nothing}`;
   }
 
   static styles = [
@@ -74,7 +71,14 @@ export default class BYFOPlayerList extends LitElement {
         display: flex;
         flex-direction: column;
         align-items: center;
+        min-width: 15rem;
         max-width: min(30rem, 100%);
+        gap: 0.5rem;
+      }
+      p {
+        margin: 0;
+        height: fit-content;
+        font-size: 1.2rem;
       }
       section {
         width: 100%;
@@ -83,11 +87,19 @@ export default class BYFOPlayerList extends LitElement {
         grid-template-columns: max-content;
         grid-auto-flow: row;
         grid-auto-rows: 2.25rem;
-        p {
-          margin: 0;
-          height: fit-content;
-          font-size: 1.2rem;
-        }
+      }
+      section.with-status {
+        grid-template-columns: max-content 2ch;
+        grid-auto-flow: column row;
+        column-gap: 1rem;
+      }
+      .ready {
+        text-align: center;
+        color: green;
+      }
+      .waiting {
+        text-align: center;
+        color: orange;
       }
       .info {
         opacity: 0.7;

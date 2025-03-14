@@ -18,7 +18,7 @@ const gapRem = 1;
 const buttonGroupRem = 2 * buttonSizeRem + gapRem;
 
 @customElement('byfo-canvas')
-export default class BYFOCanvas extends LitElement {
+export class BYFOCanvas extends LitElement {
   #canvas: Ref<HTMLCanvasElement> = createRef();
   get canvas() {
     return this.#canvas.value!;
@@ -44,6 +44,10 @@ export default class BYFOCanvas extends LitElement {
         get: () => null,
       };
     }
+  }
+
+  async getImage() {
+    return this.state?.getImage();
   }
 
   protected firstUpdated(_changedProperties: PropertyValues): void {
@@ -232,6 +236,8 @@ export default class BYFOCanvas extends LitElement {
     applicationRules,
   ];
 }
+
+export default BYFOCanvas;
 
 interface ControlButton {
   icon: Icon;

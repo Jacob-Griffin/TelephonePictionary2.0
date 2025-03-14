@@ -24,7 +24,7 @@ export function sortNames(names: string[]) {
  * @returns A sorted list of the objects
  */
 export function sortNamesBy<T extends { [key: string]: unknown }>(names: T[], sortKey: keyof T): typeof names;
-export function sortNamesBy(names: unknown[][], sortKey: number): typeof names;
+export function sortNamesBy<T extends unknown[][]>(names: T, sortKey: number): T;
 export function sortNamesBy<T extends { [key: string | number]: unknown }>(names: (Record<string, unknown> | unknown[])[], sortKey: string | number) {
   const keyMap = new Map<string, T>();
   const nameArray: string[] = [];

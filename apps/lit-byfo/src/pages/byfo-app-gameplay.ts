@@ -1,11 +1,12 @@
 import { installRootStyles } from '@byfo/themes';
-import { LitElement, TemplateResult, css, html } from 'lit';
+import { LitElement, TemplateResult, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { BYFOFirebaseAdapter, BYFOGameState, BYFOStore, emitRedirect, GameStateError, RouteResult } from 'byfo-utils';
 import { choose } from 'lit/directives/choose.js';
 import { consume } from '@lit/context';
 import { firebaseContext, routeContext, storeContext } from '../context';
-import { buttonStyle } from '@byfo/components';
+import { backdropStyle, buttonStyle, BYFOCanvas, ByfoCard, cardStyles } from '@byfo/components';
+import { createRef, ref, Ref } from 'lit/directives/ref.js';
 
 @customElement('byfo-app-gameplay')
 export class ByfoAppGameplay extends LitElement {
@@ -19,9 +20,27 @@ export class ByfoAppGameplay extends LitElement {
       }
     });
     this.state?.on('currentTimeRemaining', t => this.handleTime(t));
+    this.watchMode.observe(this);
   }
 
-  @state() timeLeft: number = -1;
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.watchMode.disconnect();
+  }
+
+  @state() canvasClass = '';
+  watchMode = new ResizeObserver(entries => {
+    const entry = entries.at(-1)!;
+    const { inlineSize } = entry.contentBoxSize[0];
+    if (inlineSize > 1000 && this.canvasClass === '') {
+      this.canvasClass = 'side-by-side';
+    }
+    if (inlineSize <= 1000 && this.canvasClass === 'side-by-side') {
+      this.canvasClass = '';
+    }
+  });
+
+  @state() timeLeft?: number;
 
   @consume({ context: firebaseContext })
   firebase!: BYFOFirebaseAdapter;
@@ -32,17 +51,20 @@ export class ByfoAppGameplay extends LitElement {
   state?: BYFOGameState;
 
   handleTime(t?: number) {
-    this.timeLeft = (t ?? -1000) / 1000;
+    if (t === undefined) {
+      return;
+    }
+    this.timeLeft = t / 1000;
     if (this.timeLeft < 0 && !this.state?.submitting) {
       this.submit();
     }
   }
 
-  submit() {
+  async submit() {
     if (!this.state) {
       return;
     }
-    const content = this.state.state === 'writing' ? this.fetchText() : this.fetchImage();
+    const content = this.state.state === 'writing' ? this.fetchText() : await this.fetchImage();
     this.state.submitRound(content);
   }
 
@@ -50,25 +72,38 @@ export class ByfoAppGameplay extends LitElement {
     return;
   }
 
-  fetchImage(): string | undefined {
-    return;
+  async fetchImage(): Promise<Blob | undefined> {
+    return this.canvasRef.value?.getImage();
   }
 
-  renderTimer() {
+  canvasRef: Ref<BYFOCanvas> = createRef();
+
+  renderFrom() {
+    const card = this.state?.recievedCard;
+    return card ? ByfoCard(card.content!, card.contentType, this.state!.from, 'left') : '';
+  }
+
+  renderTimer(backdrop?: boolean) {
+    if (!this.timeLeft) {
+      return nothing;
+    }
     if (this.timeLeft < 0) {
       return "Time's up!";
     }
-    return this.state!.timeRemainingString;
+    const t = this.state!.timeRemainingString ?? '-:--';
+    return backdrop ? html`<section class="backdrop timer">${t}</section>` : t;
   }
   renderDrawingRound() {
-    return html`<h2>Drawing ${this.renderTimer()}</h2>`;
+    return html`${this.renderFrom()}<byfo-canvas class=${this.canvasClass} ${ref(this.canvasRef)} .backup-key=${`gameplay#${this.route.arg}`}></byfo-canvas
+      ><button @click=${this.submit} class="submit big">Send to <strong>${this.state?.to}</strong></button>`;
   }
   renderWritingRound() {
     return html`<h2>Writing ${this.renderTimer()}</h2>
-      <button @click=${this.submit}>Submit</button>`;
+      <button @click=${this.submit} class="submit big">Submit</button>`;
   }
   renderWaiting() {
-    return html`<byfo-player-list .statusMap=${this.state!.playersReady} />`;
+    return html`${this.renderTimer(true)}
+      <byfo-player-list class="backdrop" .statusMap=${this.state!.playersReady}><span slot="pretext">Waiting for players</span></byfo-player-list>`;
   }
 
   render() {
@@ -77,10 +112,41 @@ export class ByfoAppGameplay extends LitElement {
       ['drawing', this.renderDrawingRound.bind(this)],
       ['waiting', this.renderWaiting.bind(this)],
     ];
-    return html`${choose(this.state?.state, stateMap, () => html``)}`;
+    return html`<section class="content">${choose(this.state?.state, stateMap, () => html``)}</section>`;
   }
 
-  static styles = [css``, buttonStyle];
+  static styles = [
+    backdropStyle,
+    css`
+      :host {
+        width: 100%;
+        max-width: 1600px;
+        height: 100%;
+        padding-inline: 5vw;
+        box-sizing: border-box;
+      }
+      section.timer {
+        padding: 0.5rem;
+        width: min-content;
+      }
+      section.content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        padding-top: calc(2rem + var(--header-size));
+        box-sizing: border-box;
+        width: 100%;
+        height: 100%;
+      }
+      .card {
+        width: 100%;
+        max-width: 1000px;
+      }
+    `,
+    buttonStyle,
+    cardStyles,
+  ];
 }
 
 declare global {

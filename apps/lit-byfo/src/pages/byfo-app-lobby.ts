@@ -131,7 +131,9 @@ export class ByfoAppLobby extends LitElement {
   render() {
     return html`<h2>Game ${this.route.arg}</h2>
       <button @click=${this.copyJoinLink} ?active=${this.showCopied}>${this.showCopied ? '✓ Copied!' : '📋 Copy invite link'}</button>
-      <byfo-player-list .players=${this.players} .config=${this.config} class="backdrop"></byfo-player-list>
+      <byfo-player-list .countPlayers=${true} .players=${this.players} .config=${this.config} class="backdrop"
+        ><span slot="pretext">Waiting for players. Invite players with the game number or by sharing the join link above</span></byfo-player-list
+      >
       ${this.hosting
         ? html`<p>Round Length</p>
             <input type="text" placeholder="∞" value="3m" @input=${this.handleTimeInput} />

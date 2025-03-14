@@ -3,7 +3,7 @@ import { ByfoMarkdown } from './Markdown';
 
 export function ByfoCard(content: string, type: 'text' | 'image', author: string, alignment?: 'left' | 'right'): TemplateResult {
   return html`<article class=${`card ${type} ${alignment ?? ''}`}>
-    ${type === 'text' ? ByfoMarkdown(content) : html`<img src=${content} />`}
+    ${type === 'text' ? html`<h3>${ByfoMarkdown(content)}</h3>` : html`<img src=${content} />`}
     <div class="name-tag">${author}</div>
   </article>`;
 }
@@ -14,7 +14,11 @@ export const cardStyles = css`
     background-color: var(--byfo-color-backdrop);
     color: var(--byfo-text-backdrop);
     border-radius: 1rem;
-    padding: 0.75rem 1rem 0;
+    padding: 0.75rem 1rem 0.25rem;
+    margin-bottom: 1rem;
+    & > h3 {
+      margin-top: 0;
+    }
     & > img {
       max-width: 50rem;
       aspect-ratio: 5 / 3;
