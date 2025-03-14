@@ -69,7 +69,17 @@ export class BYFOGameState {
     this.players = await this.#firebase.fetchFinishedRounds(this.gameid);
 
     this.#gameplayHandles.timeChange = this.on('endtime', v => (this.currentTimeRemaining = v - this.#firebase.now));
-    this.#gameplayHandles.time = setInterval(() => (this.currentTimeRemaining = this.endtime - this.#firebase.now), 500);
+    this.#gameplayHandles.time = setInterval(() => {
+      const t = this.endtime - this.#firebase.now;
+      if (t % 1000 > this.currentTimeRemaining % 1000) {
+        const min = Math.floor(t / 60000).toString();
+        const sec = Math.floor((t / 1000) % 60)
+          .toString()
+          .padStart(2, '0');
+        this.timeRemainingString = `${min}:${sec}`;
+      }
+      this.currentTimeRemaining = t;
+    }, 250);
 
     this.#gameplayHandles.roundChange = this.#firebase.onRoundChange(this.gameid, this.#handleRoundChange.bind(this));
     this.#gameplayHandles.whoFinishedChange = this.#firebase.onPlayerStatusChange(this.gameid, this.#handleStatusChange.bind(this));
@@ -104,6 +114,7 @@ export class BYFOGameState {
     if (data[this.self] >= this.round) {
       this.state = 'waiting';
     }
+    this.playersReady = Object.fromEntries(Object.entries(data).map(([player, round]) => [player, round >= this.round]));
   }
 
   #handleGameOver() {
@@ -180,7 +191,9 @@ export class BYFOGameState {
   round?: number;
   endtime?: number;
   currentTimeRemaining?: number;
+  timeRemainingString?: string;
   players?: Record<string, number>;
+  playersReady?: Record<string, boolean>;
   recievedCard?: RoundContent;
   submitting?: boolean;
 

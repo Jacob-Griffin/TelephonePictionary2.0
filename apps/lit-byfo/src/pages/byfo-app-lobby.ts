@@ -1,9 +1,10 @@
 import { installRootStyles } from '@byfo/themes';
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { useInjection } from '../utils/use-injection';
-import { emitRedirect, GameStatus, PlayerList, RouteInfo } from 'byfo-utils';
+import { BYFOFirebaseAdapter, BYFOStore, emitRedirect, GameStatus, PlayerList, RouteResult } from 'byfo-utils';
 import { buttonStyle, inputStyle } from '@byfo/components/styles';
+import { firebaseContext, routeContext, storeContext } from '../context';
+import { consume } from '@lit/context';
 
 const nop = () => {};
 
@@ -12,9 +13,8 @@ export class ByfoAppLobby extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
     installRootStyles(this.shadowRoot!);
-    this.route = this.injected.getRoute!();
-    this.unsubs.list = this.injected.firebase!.onPlayerListChange(~~this.route.arg!, this.onPlayerList) ?? nop;
-    this.unsubs.status = this.injected.firebase!.onGameStatusChange(~~this.route.arg!, this.onStatusChange) ?? nop;
+    this.unsubs.list = this.firebase.onPlayerListChange(~~this.route.arg!, this.onPlayerList) ?? nop;
+    this.unsubs.status = this.firebase.onGameStatusChange(~~this.route.arg!, this.onStatusChange) ?? nop;
   }
 
   disconnectedCallback(): void {
@@ -58,19 +58,19 @@ export class ByfoAppLobby extends LitElement {
   }
 
   get hosting() {
-    if (!this.players || !this.injected.store) {
+    if (!this.players || !this.store) {
       return false;
     }
-    return this.players?.__host.username === this.injected.store?.username;
+    return this.players?.__host.username === this.store?.username;
   }
 
   get config() {
-    return this.injected.firebase?.gameConfig;
+    return this.firebase.gameConfig;
   }
 
   checkHosting() {
-    const timeValid = !!this.injected.firebase?.isValidTime(this.time);
-    const playersValid = !!this.injected.firebase?.isValidPlayerList(this.players);
+    const timeValid = !!this.firebase.isValidTime(this.time);
+    const playersValid = !!this.firebase.isValidPlayerList(this.players);
     this.canHost = timeValid && playersValid && this.hosting;
   }
 
@@ -108,11 +108,11 @@ export class ByfoAppLobby extends LitElement {
     if (!this.canHost) {
       return;
     }
-    this.injected.firebase!.beginGame(~~this.route.arg!, this.time);
+    this.firebase.beginGame(~~this.route.arg!, this.time);
   }
 
   copyJoinLink() {
-    const link = `https://${location.origin}/join/${this.route.arg}`;
+    const link = `${location.origin}/join/${this.route.arg}`;
     navigator.clipboard.writeText(link);
     this.showCopied = true;
     clearTimeout(this.copiedTimeout);
@@ -121,13 +121,17 @@ export class ByfoAppLobby extends LitElement {
     }, 2000);
   }
 
-  injected = useInjection(this, ['store', 'firebase', 'getRoute']);
-  route: RouteInfo = { route: 'lobby', arg: '' };
+  @consume({ context: routeContext })
+  route!: RouteResult;
+  @consume({ context: storeContext })
+  store!: BYFOStore;
+  @consume({ context: firebaseContext })
+  firebase!: BYFOFirebaseAdapter;
 
   render() {
     return html`<h2>Game ${this.route.arg}</h2>
       <button @click=${this.copyJoinLink} ?active=${this.showCopied}>${this.showCopied ? '✓ Copied!' : '📋 Copy invite link'}</button>
-      <byfo-player-list .players=${this.players} .config=${this.config}></byfo-player-list>
+      <byfo-player-list .players=${this.players} .config=${this.config} class="backdrop"></byfo-player-list>
       ${this.hosting
         ? html`<p>Round Length</p>
             <input type="text" placeholder="∞" value="3m" @input=${this.handleTimeInput} />

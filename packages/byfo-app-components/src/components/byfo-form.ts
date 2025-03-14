@@ -6,7 +6,7 @@ import { html } from '../utils/byfoHtml';
 import { applicationRules } from '@byfo/themes';
 import { map } from 'lit/directives/map.js';
 import { when } from 'lit/directives/when.js';
-import { buttonStyle, inputStyle } from '../styles/index';
+import { backdropStyle, buttonStyle, inputStyle } from '../styles/index';
 
 /**
  * Form element to handle inputs and validation
@@ -134,27 +134,27 @@ export class BYFOForm extends LitElement {
     `,
     buttonStyle,
     inputStyle,
+    backdropStyle,
     applicationRules,
   ];
 }
 export default BYFOForm;
 
-/**
- * Form field declaration
- * @param id The object key to retrieve values from
- * @param label The form label to go with the input
- * @param initial The value that is placed in the input by default
- * @param validate A function that takes a text value and determines if it's valid. Error throwing is allowed
- */
-export interface Field {
-  id: string;
-  label?: string;
-  initial: string;
-  validate?: (val: string) => boolean;
-}
-
 declare global {
   interface HTMLElementTagNameMap {
     'byfo-form': BYFOForm;
+  }
+  /**
+   * Form field declaration
+   * @param id The object key to retrieve values from
+   * @param label The form label to go with the input
+   * @param initial The value that is placed in the input by default
+   * @param validate A function that takes a text value and determines if it's valid. Error throwing is allowed
+   */
+  export interface Field {
+    id: string;
+    label?: string;
+    initial: string;
+    validate?: (val: string) => boolean;
   }
 }

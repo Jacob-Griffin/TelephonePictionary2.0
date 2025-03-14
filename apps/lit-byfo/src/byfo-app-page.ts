@@ -7,6 +7,8 @@ import { BYFOStore } from 'byfo-utils/storage';
 import { ByfoIcon } from '@byfo/components/functional';
 import '@byfo/components/all';
 import { BYFOFirebaseAdapter, RedirectEventMap, RouteResult } from 'byfo-utils';
+import { provide } from '@lit/context';
+import { firebaseContext, storeContext, routeContext } from './context';
 
 @customElement('byfo-app-page')
 export class ByfoAppPage extends LitElement {
@@ -22,8 +24,7 @@ export class ByfoAppPage extends LitElement {
     if (!routeObj) {
       return;
     }
-    this.route = route;
-    this.routeArg = arg;
+    this.route = { route, arg };
     if (!fromWindow) {
       window.history.pushState({}, '', routeObj.renderUrl(arg));
     }
@@ -45,7 +46,7 @@ export class ByfoAppPage extends LitElement {
       this.#redirect(route.route, route.arg, fromWindow);
     } else {
       const [defaultRoute] = Object.entries(routes).find(([_, value]) => value.default) ?? ['home'];
-      this.route = defaultRoute;
+      this.route = { route: defaultRoute, arg: undefined };
       window.history.replaceState({}, '', '/');
     }
   }
@@ -54,24 +55,19 @@ export class ByfoAppPage extends LitElement {
     this.#redirect(detail.route, detail.arg);
   };
 
-  store = new BYFOStore();
-  firebase = new BYFOFirebaseAdapter(__FIREBASE_CONFIG__, {}, true);
-  provides = {
-    store: this.store,
-    firebase: this.firebase,
-    getRoute: () => ({ route: this.route, arg: this.routeArg }),
-  };
-  loaded: boolean = false;
+  @provide({ context: storeContext }) store = new BYFOStore();
+  @provide({ context: firebaseContext }) firebase = new BYFOFirebaseAdapter(__FIREBASE_CONFIG__, {}, true);
 
-  @state() route?: string;
-  @state() routeArg?: string;
+  @provide({ context: routeContext })
+  @state()
+  route: RouteResult = { route: '' };
 
   render() {
-    return html`<section class=${this.route === 'home' ? 'header invisible' : 'header'}>
+    return html`<section class=${this.route.route === 'home' ? 'header invisible' : 'header'}>
         <div id="small-logo"></div>
         <byfo-modal id="settings"><span slot="buttontext">${ByfoIcon('gear')}</span><byfo-settings slot="content" .store=${this.store}></byfo-settings></byfo-modal>
       </section>
-      <main @byforedirect=${this.handleRedirect}>${choose(this.route, routeMap, () => html``)}</main>`;
+      <main @byforedirect=${this.handleRedirect}>${choose(this.route.route, routeMap, () => html``)}</main>`;
   }
 
   static styles = css`

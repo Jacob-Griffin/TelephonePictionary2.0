@@ -41,6 +41,9 @@ importers:
       '@byfo/themes':
         specifier: workspace:^
         version: link:../../packages/byfo-app-themes
+      '@lit/context':
+        specifier: ^1.1.4
+        version: 1.1.4
       byfo-utils:
         specifier: workspace:^
         version: link:../../packages/byfo-utils
@@ -928,6 +931,9 @@ packages:
 
   '@lit-labs/ssr-dom-shim@1.2.0':
     resolution: {integrity: sha512-yWJKmpGE6lUURKAaIltoPIE/wrbY3TEkqQt+X0m+7fQNnAv0keydnYvbiJFP1PnMhizmIWRWOG5KLhYyc/xl+g==}
+
+  '@lit/context@1.1.4':
+    resolution: {integrity: sha512-0b8wOWNUPcXjGHFtVP+odwhrZBZw+PpCjKWn8IGO10iHT95Xd6FcUAxe1aE7PUtOBvHZoxvrfdBzweYnDW7VNQ==}
 
   '@lit/reactive-element@2.0.4':
     resolution: {integrity: sha512-GFn91inaUa2oHLak8awSIigYz0cU0Payr1rcFsrkf5OJ5eSPxElyZfKh0f2p9FsTiZWXQdWGJeXZICEfXXYSXQ==}
@@ -3726,6 +3732,10 @@ snapshots:
     optional: true
 
   '@lit-labs/ssr-dom-shim@1.2.0': {}
+
+  '@lit/context@1.1.4':
+    dependencies:
+      '@lit/reactive-element': 2.0.4
 
   '@lit/reactive-element@2.0.4':
     dependencies:

@@ -1,41 +1,37 @@
 import { installRootStyles } from '@byfo/themes';
 import { LitElement, css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import type { Field } from '@byfo/components';
-import { emitRedirect, isValidGameId, isValidUsername } from 'byfo-utils';
-import { useInjection } from '../utils/use-injection';
+import { emitRedirect, isValidGameId, isValidUsername, type BYFOFirebaseAdapter, type BYFOStore } from 'byfo-utils';
+import { firebaseContext, storeContext } from '../context';
+import { consume } from '@lit/context';
 
-type FormType = 'join' | 'host' | 'review' | 'search';
 type Form = { action: (v: Record<string, string>) => void; fields: Field[] };
-type FormMap = Record<FormType, Form>;
+
 @customElement('byfo-app-home')
 export class ByfoAppHome extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
     installRootStyles(this.shadowRoot!);
-    this.forms = this.createForms();
   }
 
-  injected = useInjection(this, ['store', 'firebase']);
+  @consume({ context: firebaseContext })
+  firebase!: BYFOFirebaseAdapter;
+  @consume({ context: storeContext })
+  store!: BYFOStore;
 
-  setGameVars = ({ gameid, username }: Record<string, string>) => {
-    if (gameid) {
-      this.injected.store?.setGameid(gameid);
-    }
-    if (username) {
-      this.injected.store?.setUsername(username);
-    }
-  };
-
-  forms?: FormMap;
-  createForms: () => FormMap = () => ({
+  forms: Record<string, Form> = {
     join: {
       action: async values => {
-        const response = await this.injected.firebase!.addPlayerToLobby(~~values.gameid, values.username);
+        const response = await this.firebase.addPlayerToLobby(~~values.gameid, values.username);
         if (response.action === 'error') {
           throw new Error(response.detail);
         }
-        this.setGameVars(values);
+        if (values.gameid) {
+          this.store.setGameid(values.gameid);
+        }
+        if (values.username) {
+          this.store.setUsername(values.username);
+        }
         emitRedirect(this, { route: response.dest!, arg: values.gameid });
       },
       fields: [
@@ -43,21 +39,24 @@ export class ByfoAppHome extends LitElement {
           label: 'Name',
           id: 'username',
           validate: isValidUsername,
-          initial: this.injected.store?.username ?? '',
+          initial: this.store?.username ?? '',
         },
         {
           label: 'Game ID',
           id: 'gameid',
           validate: isValidGameId,
-          initial: this.injected.store?.gameid ?? '',
+          initial: this.store?.gameid ?? '',
         },
       ],
     },
     host: {
       action: async values => {
-        const id = await this.injected.firebase?.createGame(values.username);
+        const id = await this.firebase.createGame(values.username);
         if (id) {
-          this.setGameVars({ ...values, gameid: id });
+          if (values.username) {
+            this.store.setUsername(values.username);
+          }
+          this.store.setGameid(id);
           emitRedirect(this, { route: 'lobby', arg: id });
         }
       },
@@ -66,13 +65,13 @@ export class ByfoAppHome extends LitElement {
           label: 'Name',
           id: 'username',
           validate: isValidUsername,
-          initial: this.injected.store?.username ?? '',
+          initial: this.store?.username ?? '',
         },
       ],
     },
     review: {
       action: async values => {
-        const status = await this.injected.firebase?.getGameStatus(~~values.gameid);
+        const status = await this.firebase.getGameStatus(~~values.gameid);
         if (!status) {
           throw new Error(`Game ${values.gameid} does not exist`);
         }
@@ -86,13 +85,13 @@ export class ByfoAppHome extends LitElement {
           label: 'Game ID',
           id: 'gameid',
           validate: isValidGameId,
-          initial: this.injected.store?.gameid ?? '',
+          initial: '',
         },
       ],
     },
     search: {
       action: values => {
-        console.log(values.query);
+        emitRedirect(this, { route: 'review', arg: values.query });
       },
       fields: [
         {
@@ -102,12 +101,9 @@ export class ByfoAppHome extends LitElement {
         },
       ],
     },
-  });
+  };
 
   render() {
-    if (!this.forms) {
-      this.forms = this.createForms();
-    }
     return html`<div id="icon-row">
         <div id="icon-spacer"></div>
         <div id="main-icon"></div>

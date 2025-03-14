@@ -44,6 +44,20 @@ export const routes: RouteList = {
     renderUrl: gameid => `/lobby/${gameid}`,
     title: 'Lobby',
   },
+  join: {
+    match: p => {
+      const r = p.match(/^\/join\/(\d{1,7})\/?$/);
+      return !!r ? { route: 'join', arg: r[1] } : {};
+    },
+    render: () => {
+      if (!window.customElements.get('byfo-app-join')) {
+        import('./pages/byfo-app-join.ts');
+      }
+      return html`<byfo-app-join></byfo-app-join>`;
+    },
+    renderUrl: gameid => `/join/${gameid}`,
+    title: 'Join',
+  },
   review: {
     match: p => {
       const r = p.match(/^\/review\/(\d{1,7})\/?$/);

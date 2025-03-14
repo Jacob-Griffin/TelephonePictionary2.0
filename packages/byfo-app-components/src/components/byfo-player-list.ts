@@ -4,6 +4,7 @@ import { html } from '../utils/byfoHtml';
 import { BYFOConfig, sortNames, sortNamesBy, type PlayerList } from 'byfo-utils';
 import { property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
+import backdropStyle from '../styles/backdrop.style';
 
 @customElement('byfo-player-list')
 export default class BYFOPlayerList extends LitElement {
@@ -74,9 +75,6 @@ export default class BYFOPlayerList extends LitElement {
         flex-direction: column;
         align-items: center;
         max-width: min(30rem, 100%);
-        background-color: var(--byfo-color-backdrop);
-        border-radius: 1rem;
-        padding: 0.5rem 2rem;
       }
       section {
         width: 100%;
@@ -97,6 +95,7 @@ export default class BYFOPlayerList extends LitElement {
         text-align: center;
       }
     `,
+    backdropStyle,
   ];
 }
 

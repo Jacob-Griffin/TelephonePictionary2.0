@@ -1,8 +1,10 @@
 import { installRootStyles } from '@byfo/themes';
 import { CSSResultGroup, LitElement, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { useInjection } from '../utils/use-injection';
 import { buttonStyle } from '@byfo/components/styles';
+import { consume } from '@lit/context';
+import { firebaseContext, routeContext, storeContext } from '../context';
+import { BYFOFirebaseAdapter, BYFOStore, RouteResult } from 'byfo-utils';
 
 @customElement('byfo-app-lobby')
 export class ByfoAppLobby extends LitElement {
@@ -15,8 +17,12 @@ export class ByfoAppLobby extends LitElement {
   render() {
     return html`Review`;
   }
-
-  injected = useInjection(this, ['firebase', 'store', 'getRoute']);
+  @consume({ context: firebaseContext })
+  firebase!: BYFOFirebaseAdapter;
+  @consume({ context: storeContext })
+  store!: BYFOStore;
+  @consume({ context: routeContext })
+  route!: RouteResult;
 
   static styles?: CSSResultGroup | undefined = [css``, buttonStyle];
 }

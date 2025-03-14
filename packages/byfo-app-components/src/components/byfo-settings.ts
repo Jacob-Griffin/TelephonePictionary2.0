@@ -175,10 +175,4 @@ declare global {
   interface HTMLElementTagNameMap {
     'byfo-settings': BYFOSettings;
   }
-  export interface Field {
-    id: string;
-    label: string;
-    initial: string;
-    validate?: (val: string) => boolean;
-  }
 }
