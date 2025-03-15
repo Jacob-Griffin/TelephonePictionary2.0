@@ -1,4 +1,4 @@
-import { LitElement, PropertyValues, css, nothing } from 'lit';
+import { LitElement, PropertyValues, TemplateResult, css, nothing } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { customElement } from '../utils/byfoCustomElement';
 import { createRef, ref, Ref } from 'lit/directives/ref.js';
@@ -10,6 +10,7 @@ import { ByfoIcon } from './functional/Icon';
 
 import buttonStyles from '../styles/button.style';
 import { applicationRules } from '@byfo/themes';
+import { backdropStyle } from '../styles';
 
 const internalWidth = 1000;
 const internalHeight = 600;
@@ -45,6 +46,10 @@ export class BYFOCanvas extends LitElement {
       };
     }
   }
+
+  @property() submitText: string | TemplateResult = 'Submit';
+  @property() onSubmit: () => unknown = () => {};
+  @property() timeLeft: string = '-:--';
 
   async getImage() {
     return this.state?.getImage();
@@ -125,8 +130,6 @@ export class BYFOCanvas extends LitElement {
         action: 'clearCanvas',
         class: 'important',
       },
-    ],
-    [
       {
         icon: 'swap',
         action: 'invert',
@@ -170,7 +173,10 @@ export class BYFOCanvas extends LitElement {
 
   renderControls = () => {
     const buttons = (this.constructor as typeof BYFOCanvas).buttons;
-    return html`<section class="controls">${map(buttons, this.renderButtonGroup)}</section>`;
+    return html`<section class="controls">
+      <section class="backdrop">${this.timeLeft}</section>
+      ${map(buttons, this.renderButtonGroup)}<button @click=${this.onSubmit} class="wide">${this.submitText}</button>
+    </section>`;
   };
 
   render() {
@@ -182,7 +188,6 @@ export class BYFOCanvas extends LitElement {
       :host {
         --grid-size: 1fr ${buttonGroupRem}rem;
         display: grid;
-        grid-template-rows: var(--grid-size);
         column-gap: ${gapRem}rem;
         row-gap: ${gapRem}rem;
         max-width: ${internalWidth}px;
@@ -192,30 +197,47 @@ export class BYFOCanvas extends LitElement {
         grid-template-rows: unset;
         max-width: calc(${internalWidth}px + ${buttonGroupRem}rem + ${gapRem}rem);
         .controls {
-          height: ${5 * buttonSizeRem + 4 * gapRem}rem;
-          grid-template-rows: repeat(${BYFOCanvas.buttons.length}, ${buttonSizeRem}rem);
+          grid-template-rows: min-content repeat(${BYFOCanvas.buttons.length}, ${buttonSizeRem}rem);
           grid-template-columns: repeat(2, ${buttonSizeRem}rem);
           grid-auto-flow: row;
           div {
             grid-column-end: span 2;
           }
+          section.backdrop {
+            grid-column: span 2;
+          }
+          .wide {
+            width: ${buttonGroupRem}rem;
+            grid-column: span 2;
+          }
         }
       }
       .controls {
-        width: ${5 * buttonSizeRem + 4 * gapRem}rem;
+        width: ${6 * buttonSizeRem + 5 * gapRem}rem;
         max-width: fit-content;
         align-self: center;
         justify-self: center;
         display: grid;
-        grid-template-rows: ${buttonSizeRem}rem ${buttonSizeRem}rem;
-        grid-auto-columns: ${buttonGroupRem}rem;
-        grid-auto-rows: ${buttonSizeRem}rem;
-        grid-auto-flow: column;
+        grid-template-rows: min-content ${buttonSizeRem}rem ${buttonSizeRem}rem;
+        grid-template-columns: repeat(3, ${buttonGroupRem}rem);
         column-gap: ${gapRem}rem;
         row-gap: ${gapRem}rem;
+        grid-auto-flow: column dense;
         button {
           width: ${buttonSizeRem}rem;
           height: ${buttonSizeRem}rem;
+        }
+        section.backdrop {
+          height: fit-content;
+          width: fit-content;
+          grid-row: 1;
+          grid-column: span 3;
+          align-self: center;
+          justify-self: center;
+        }
+        .wide {
+          width: ${buttonGroupRem}rem;
+          font-size: 1.4rem;
         }
       }
       canvas {
@@ -233,6 +255,7 @@ export class BYFOCanvas extends LitElement {
       }
     `,
     buttonStyles,
+    backdropStyle,
     applicationRules,
   ];
 }

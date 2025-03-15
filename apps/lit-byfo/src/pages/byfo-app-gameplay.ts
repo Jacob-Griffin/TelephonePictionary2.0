@@ -8,6 +8,11 @@ import { firebaseContext, routeContext, storeContext } from '../context';
 import { backdropStyle, buttonStyle, BYFOCanvas, ByfoCard, cardStyles } from '@byfo/components';
 import { createRef, ref, Ref } from 'lit/directives/ref.js';
 
+/**
+ * The minimum amount of pixels wide where the canvas controls move to the right
+ */
+const sideBySideThreshold = 1125;
+
 @customElement('byfo-app-gameplay')
 export class ByfoAppGameplay extends LitElement {
   connectedCallback(): void {
@@ -32,10 +37,10 @@ export class ByfoAppGameplay extends LitElement {
   watchMode = new ResizeObserver(entries => {
     const entry = entries.at(-1)!;
     const { inlineSize } = entry.contentBoxSize[0];
-    if (inlineSize > 1000 && this.canvasClass === '') {
+    if (inlineSize > sideBySideThreshold && this.canvasClass === '') {
       this.canvasClass = 'side-by-side';
     }
-    if (inlineSize <= 1000 && this.canvasClass === 'side-by-side') {
+    if (inlineSize <= sideBySideThreshold && this.canvasClass === 'side-by-side') {
       this.canvasClass = '';
     }
   });
@@ -94,8 +99,17 @@ export class ByfoAppGameplay extends LitElement {
     return backdrop ? html`<section class="backdrop timer">${t}</section>` : t;
   }
   renderDrawingRound() {
-    return html`${this.renderFrom()}<byfo-canvas class=${this.canvasClass} ${ref(this.canvasRef)} .backup-key=${`gameplay#${this.route.arg}`}></byfo-canvas
-      ><button @click=${this.submit} class="submit big">Send to <strong>${this.state?.to}</strong></button>`;
+    return html`${this.renderFrom()}
+      <section class="backdrop">
+        <h4>Sending to: <strong>${this.state?.to}</strong></h4>
+      </section>
+      <byfo-canvas
+        class=${this.canvasClass}
+        ${ref(this.canvasRef)}
+        .backup-key=${`gameplay#${this.route.arg}`}
+        .onSubmit=${this.submit}
+        .timeLeft=${this.state?.timeRemainingString}
+      ></byfo-canvas>`;
   }
   renderWritingRound() {
     return html`<h2>Writing ${this.renderTimer()}</h2>
@@ -142,6 +156,12 @@ export class ByfoAppGameplay extends LitElement {
       .card {
         width: 100%;
         max-width: 1000px;
+      }
+      section:has(h4) {
+        margin: -0.25rem;
+        h4 {
+          margin: 0;
+        }
       }
     `,
     buttonStyle,
