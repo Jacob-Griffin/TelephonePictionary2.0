@@ -31,8 +31,8 @@ export default class BYFOPlayerList extends LitElement {
         // TODO Sorting
         const sorted = sortNamesBy(Object.entries(this.statusMap), 0);
         for (const [name, ready] of sorted) {
-          newlist.push(html`<p>${decodePath(name)}</p>`);
           newlist.push(html`<p class=${ready ? 'ready' : 'waiting'}>${ready ? '✓' : '•'}</p>`);
+          newlist.push(html`<p>${decodePath(name)}</p>`);
         }
         this.displayItems = newlist;
       } else {
@@ -89,7 +89,7 @@ export default class BYFOPlayerList extends LitElement {
         grid-auto-rows: 2.25rem;
       }
       section.with-status {
-        grid-template-columns: max-content 2ch;
+        grid-template-columns: 2ch max-content;
         grid-auto-flow: column row;
         column-gap: 1rem;
       }
