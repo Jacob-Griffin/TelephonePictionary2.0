@@ -118,6 +118,9 @@ export class BYFOGameState {
     }
     this.endtime = data.endTime;
     this.round = data.roundnumber;
+    if (data.endTime > 0) {
+      this.timeTick();
+    }
     if ((this.players as Record<string, number>)?.[this.#self] >= this.round) {
       this.state = 'waiting';
     } else {
@@ -131,7 +134,6 @@ export class BYFOGameState {
   async #handleStatusChange(data: Record<string, number>) {
     this.players = data;
     if (!data) {
-      this.state = 'finished';
       return;
     }
     if (data[encodePath(this.self)] >= this.round) {
@@ -150,20 +152,20 @@ export class BYFOGameState {
     return `gameplay#${this.gameid}@${this.round}`;
   }
 
-  getBackup() {
+  getBackup = () => {
     return localStorage.getItem(this.backupKey);
-  }
+  };
 
-  setBackup(data?: string) {
+  setBackup = (data?: string) => {
     if (!data) {
       localStorage.removeItem(this.backupKey);
       return;
     }
     localStorage.setItem(this.backupKey, data);
-  }
+  };
 
   clearBackups() {
-    for (let i = 0; i < (this.staticRoundInfo?.lastRound ?? 0); i++) {
+    for (let i = 0; i <= (this.staticRoundInfo?.lastRound ?? 0); i++) {
       localStorage.removeItem(`gameplay#${this.gameid}@${i}`);
     }
   }
@@ -246,7 +248,7 @@ export class BYFOGameState {
   players?: Record<string, number>;
   playersReady?: Record<string, boolean>;
   recievedCard?: RoundContent;
-  submitting?: boolean;
+  submitting: boolean = false;
 
   accessorList = ['round', 'currentTimeRemaining', 'endtime', 'players', 'recievedCard', 'state', 'submitting'] as const;
   on = useAccessor<BYFOGameState>(this);

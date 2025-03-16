@@ -6,8 +6,8 @@ import { consume } from '@lit/context';
 import { firebaseContext, routeContext, storeContext } from '../context';
 import { BYFOFirebaseAdapter, BYFOStore, RouteResult } from 'byfo-utils';
 
-@customElement('byfo-app-lobby')
-export class ByfoAppLobby extends LitElement {
+@customElement('byfo-app-review')
+export class ByfoAppReview extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
     installRootStyles(this.shadowRoot!);

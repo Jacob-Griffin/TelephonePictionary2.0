@@ -21,6 +21,7 @@ export class BYFOWritingInput extends LitElement {
     super.connectedCallback();
     this.text = this.gameState?.getBackup() ?? '';
     this.gameState?.on('currentTimeRemaining', t => (t && t < 0 ? this.submit() : null));
+    this.gameState?.on('submitting', v => (this.submitting = v));
   }
 
   protected firstUpdated(_changedProperties: PropertyValues): void {
@@ -52,6 +53,7 @@ export class BYFOWritingInput extends LitElement {
   @state() textValid: boolean = false;
   @state() textLength: number = 0;
   @state() textLines: number = 1;
+  @state() submitting: boolean = false;
   handleInput = (e: InputEvent) => {
     this.text = (e.target as HTMLInputElement).value;
   };
@@ -74,7 +76,8 @@ export class BYFOWritingInput extends LitElement {
   }
 
   render() {
-    return html`${this.renderTextBox()} <button class="big" @click=${this.submit} ?disabled=${!this.textValid}>Submit</button>`;
+    return html`${this.renderTextBox()}
+      <button class="big" @click=${this.submit} ?disabled=${!this.textValid || this.submitting}>${this.submitting ? 'Submitting...' : 'Submit'}</button>`;
   }
   static styles = [
     css`

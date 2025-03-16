@@ -27,7 +27,15 @@ export class ByfoAppGameplay extends LitElement {
       })
       .then(() => (this.staticRoundInfo = this.state?.staticRoundInfo));
     this.state?.on('currentTimeRemaining', t => this.handleTime(t));
-    this.state?.on('state', () => this.requestUpdate());
+    this.state?.on('state', newState => {
+      if (newState === 'finished') {
+        this.store?.setGameid(null);
+        this.store?.setUsername(null);
+        emitRedirect(this, { route: 'review', arg: this.route.arg });
+        return;
+      }
+      this.requestUpdate();
+    });
     this.state?.on('recievedCard', () => this.requestUpdate());
     this.watchMode.observe(this);
   }

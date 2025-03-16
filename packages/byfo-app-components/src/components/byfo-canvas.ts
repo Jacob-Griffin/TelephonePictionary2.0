@@ -29,12 +29,15 @@ export class BYFOCanvas extends LitElement {
   box?: DOMRect;
   state?: BYFOCanvasState;
 
-  backup = {
-    get: this.gameState?.getBackup ?? nop,
-    set: this.gameState?.setBackup ?? nop,
-  };
+  get backup() {
+    return {
+      get: this.gameState?.getBackup ?? nop,
+      set: this.gameState?.setBackup ?? nop,
+    };
+  }
 
   @property() gameState?: BYFOGameState;
+  @state() submitting: boolean = false;
 
   async getImage() {
     return this.state?.getImage();
@@ -50,13 +53,14 @@ export class BYFOCanvas extends LitElement {
   };
 
   get canSubmit() {
-    return !this.gameState?.submitting && (this.state?.paths.length ?? 0) > 1;
+    return !this.submitting && (this.state?.paths.length ?? 0) > 1 && this.state?.paths.at(-1)?.clear === undefined;
   }
 
   protected firstUpdated(_changedProperties: PropertyValues): void {
     const backupdata = this.backup.get() ?? undefined;
     this.state = new BYFOCanvasState(this.canvas, { internalHeight, internalWidth }, backupdata);
     this.state.on('backup', data => {
+      console.log(data);
       this.backup.set(data);
       if (this.state!.paths.length <= 2) {
         this.requestUpdate();
@@ -67,7 +71,15 @@ export class BYFOCanvas extends LitElement {
     this.mode = this.state.mode;
     this.currentWidth = this.state.currentWidth;
     this.canvas.addEventListener('contextmenu', e => e.preventDefault());
-    this.gameState?.on('currentTimeRemaining', t => (t && t < 0 ? this.submit() : null));
+    this.gameState?.on('currentTimeRemaining', t => {
+      if (t) {
+        if (t < 0) {
+          this.submit();
+        }
+        this.requestUpdate();
+      }
+    });
+    this.gameState?.on('submitting', v => (this.submitting = v));
   }
 
   disconnectedCallback(): void {
@@ -179,7 +191,7 @@ export class BYFOCanvas extends LitElement {
     const buttons = (this.constructor as typeof BYFOCanvas).buttons;
     return html`<section class="controls">
       <section class="backdrop">${this.gameState?.timeRemainingString ?? html`<span></span>`}</section>
-      ${map(buttons, this.renderButtonGroup)}<button @click=${this.submit} class="wide" ?disabled=${!this.canSubmit}>Submit</button>
+      ${map(buttons, this.renderButtonGroup)}<button @click=${this.submit} class="wide" ?disabled=${!this.canSubmit}>${this.submitting ? 'Submitting...' : 'Submit'}</button>
     </section>`;
   };
 
