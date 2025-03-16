@@ -5,8 +5,7 @@ import { BYFOFirebaseAdapter, BYFOGameState, BYFOStore, emitRedirect, GameStateE
 import { choose } from 'lit/directives/choose.js';
 import { consume } from '@lit/context';
 import { firebaseContext, routeContext, storeContext } from '../context';
-import { backdropStyle, buttonStyle, BYFOCanvas, ByfoCard, cardStyles } from '@byfo/components';
-import { createRef, ref, Ref } from 'lit/directives/ref.js';
+import { backdropStyle, buttonStyle, ByfoCard, cardStyles, inputStyle } from '@byfo/components';
 
 /**
  * The minimum amount of pixels wide where the canvas controls move to the right
@@ -60,32 +59,15 @@ export class ByfoAppGameplay extends LitElement {
       return;
     }
     this.timeLeft = t / 1000;
-    if (this.timeLeft < 0 && !this.state?.submitting) {
-      this.submit();
-    }
   }
-
-  async submit() {
-    if (!this.state) {
-      return;
-    }
-    const content = this.state.state === 'writing' ? this.fetchText() : await this.fetchImage();
-    this.state.submitRound(content);
-  }
-
-  fetchText(): string | undefined {
-    return;
-  }
-
-  async fetchImage(): Promise<Blob | undefined> {
-    return this.canvasRef.value?.getImage();
-  }
-
-  canvasRef: Ref<BYFOCanvas> = createRef();
 
   renderFrom() {
     const card = this.state?.recievedCard;
-    return card ? ByfoCard(card.content!, card.contentType, this.state!.from, 'left') : '';
+    const cnode = card ? ByfoCard(card.content!, card.contentType, this.state!.from, 'left') : '';
+    return html`${cnode}
+      <section class="backdrop">
+        <h4>Sending to: <strong>${this.state?.to}</strong></h4>
+      </section>`;
   }
 
   renderTimer(backdrop?: boolean) {
@@ -99,21 +81,10 @@ export class ByfoAppGameplay extends LitElement {
     return backdrop ? html`<section class="backdrop timer">${t}</section>` : t;
   }
   renderDrawingRound() {
-    return html`${this.renderFrom()}
-      <section class="backdrop">
-        <h4>Sending to: <strong>${this.state?.to}</strong></h4>
-      </section>
-      <byfo-canvas
-        class=${this.canvasClass}
-        ${ref(this.canvasRef)}
-        .backup-key=${`gameplay#${this.route.arg}`}
-        .onSubmit=${this.submit}
-        .timeLeft=${this.state?.timeRemainingString}
-      ></byfo-canvas>`;
+    return html`${this.renderFrom()} <byfo-canvas class=${this.canvasClass} .gameState=${this.state}></byfo-canvas>`;
   }
   renderWritingRound() {
-    return html`<h2>Writing ${this.renderTimer()}</h2>
-      <button @click=${this.submit} class="submit big">Submit</button>`;
+    return html`${this.renderFrom()} ${this.renderTimer(true)} <byfo-writing-input .gameState=${this.state}></byfo-writing-input>`;
   }
   renderWaiting() {
     return html`${this.renderTimer(true)}
@@ -126,7 +97,10 @@ export class ByfoAppGameplay extends LitElement {
       ['drawing', this.renderDrawingRound.bind(this)],
       ['waiting', this.renderWaiting.bind(this)],
     ];
-    return html`<section class="content">${choose(this.state?.state, stateMap, () => html``)}</section>`;
+    return html`<section class="content">
+      <h2>Round ${(this.state?.round ?? 0) + 1}/${(this.state?.staticRoundInfo?.lastRound ?? 0) + 1}</h2>
+      ${choose(this.state?.state, stateMap, () => html``)}
+    </section>`;
   }
 
   static styles = [
@@ -156,6 +130,9 @@ export class ByfoAppGameplay extends LitElement {
       .card {
         width: 100%;
         max-width: 1000px;
+        &.image {
+          max-width: fit-content;
+        }
       }
       section:has(h4) {
         margin: -0.25rem;
@@ -166,6 +143,7 @@ export class ByfoAppGameplay extends LitElement {
     `,
     buttonStyle,
     cardStyles,
+    inputStyle,
   ];
 }
 

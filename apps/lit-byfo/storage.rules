@@ -1,12 +1,18 @@
 rules_version = '2';
-
-// Craft rules based on data in your Firestore database
-// allow write: if firestore.get(
-//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
 service firebase.storage {
   match /b/{bucket}/o {
-    match /{allPaths=**} {
-      allow read, write: if false;
+    match /games/{gameid} {
+      allow read: if true;
+    	allow write: if $gameid.matches('[0-9]{1,6}');
+      match /{roundnumber}{
+      	match /{player}{
+        	allow read: if true
+      		allow write: if request.resource.contentType == 'image/png' && request.resource.size < 200 * 1024;
+        }
+      }
+      match /{others=**}{
+      	allow write: if false;
+      }
     }
   }
 }

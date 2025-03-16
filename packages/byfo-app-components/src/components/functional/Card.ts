@@ -20,7 +20,8 @@ export const cardStyles = css`
       margin-top: 0;
     }
     & > img {
-      max-width: 50rem;
+      width: 100%;
+      max-width: 1000px;
       aspect-ratio: 5 / 3;
       border-radius: 0.5rem;
       margin-bottom: 1rem;

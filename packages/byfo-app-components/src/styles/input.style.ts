@@ -1,7 +1,8 @@
 import { css } from 'lit';
 
 export const inputStyle = css`
-  input {
+  input,
+  span[contentEditable] {
     box-sizing: border-box;
     height: fit-content;
     margin: 0;

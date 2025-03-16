@@ -1,9 +1,9 @@
-import { LitElement, PropertyValues, TemplateResult, css, nothing } from 'lit';
+import { LitElement, PropertyValues, css, nothing } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { customElement } from '../utils/byfoCustomElement';
 import { createRef, ref, Ref } from 'lit/directives/ref.js';
 import { html } from '../utils/byfoHtml';
-import { BYFOCanvasState } from 'byfo-utils';
+import { BYFOCanvasState, BYFOGameState } from 'byfo-utils';
 import { map } from 'lit/directives/map.js';
 
 import { ByfoIcon } from './functional/Icon';
@@ -27,13 +27,16 @@ export class BYFOCanvas extends LitElement {
   box?: DOMRect;
   state?: BYFOCanvasState;
 
-  @property() backupKey?: string;
+  get backupKey() {
+    return `gameplay#${this.gameState?.gameid}@${this.gameState?.round}`;
+  }
   get backup() {
     if (this.backupKey) {
       return {
-        set: (data: string) => {
+        set: (data?: string) => {
           if (!data) {
             localStorage.removeItem(this.backupKey!);
+            return;
           }
           localStorage.setItem(this.backupKey!, data);
         },
@@ -41,18 +44,28 @@ export class BYFOCanvas extends LitElement {
       };
     } else {
       return {
-        set: (_data: string) => void null,
+        set: (_data?: string) => void null,
         get: () => null,
       };
     }
   }
 
-  @property() submitText: string | TemplateResult = 'Submit';
-  @property() onSubmit: () => unknown = () => {};
-  @property() timeLeft: string = '-:--';
+  @property() gameState?: BYFOGameState;
 
   async getImage() {
     return this.state?.getImage();
+  }
+
+  async submit() {
+    await this.gameState?.submitRound(await this.getImage()).then(r => {
+      if (!r || !('error' in r)) {
+        this.backup.set();
+      }
+    });
+  }
+
+  get canSubmit() {
+    return !this.gameState?.submitting && (this.state?.paths.length ?? 0) > 0;
   }
 
   protected firstUpdated(_changedProperties: PropertyValues): void {
@@ -64,6 +77,7 @@ export class BYFOCanvas extends LitElement {
     this.mode = this.state.mode;
     this.currentWidth = this.state.currentWidth;
     this.canvas.addEventListener('contextmenu', e => e.preventDefault());
+    this.gameState?.on('currentTimeRemaining', t => (t && t < 0 ? this.submit() : null));
   }
 
   disconnectedCallback(): void {
@@ -174,8 +188,8 @@ export class BYFOCanvas extends LitElement {
   renderControls = () => {
     const buttons = (this.constructor as typeof BYFOCanvas).buttons;
     return html`<section class="controls">
-      <section class="backdrop">${this.timeLeft}</section>
-      ${map(buttons, this.renderButtonGroup)}<button @click=${this.onSubmit} class="wide">${this.submitText}</button>
+      <section class="backdrop">${this.gameState?.timeRemainingString}</section>
+      ${map(buttons, this.renderButtonGroup)}<button @click=${this.submit} class="wide" ?disabled=${!this.canSubmit}>Submit</button>
     </section>`;
   };
 

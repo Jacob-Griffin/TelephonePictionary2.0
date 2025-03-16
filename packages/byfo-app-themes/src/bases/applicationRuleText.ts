@@ -92,11 +92,16 @@ export default css`
   }
 
   input,
-  select {
+  select,
+  textarea {
     background-color: var(--byfo-color-background);
     color: var(--byfo-text-main);
     border: solid 1px var(--byfo-color-border);
     border-radius: 0.5rem;
+  }
+
+  textarea {
+    font-family: inherit;
   }
 
   ::-webkit-scrollbar {

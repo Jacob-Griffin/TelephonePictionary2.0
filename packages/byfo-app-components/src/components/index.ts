@@ -3,3 +3,4 @@ export * from './byfo-form';
 export * from './byfo-modal';
 export * from './byfo-settings';
 export * from './byfo-player-list';
+export * from './byfo-writing-input';

@@ -62,7 +62,7 @@ export class BYFOFirebaseAdapter {
       console.log('Connecting to firebase emulators');
       connectDatabaseEmulator(this.connection.rtdb, '127.0.0.1', 9000);
       connectFirestoreEmulator(this.connection.db, '127.0.0.1', 8080);
-      connectStorageEmulator(this.connection.storage, '127.0.0.1', 5000);
+      connectStorageEmulator(this.connection.storage, '127.0.0.1', 9199);
     }
     this.gameConfig = Object.assign({}, defaultGameConfig, gameConfig);
     if (internetTime) {

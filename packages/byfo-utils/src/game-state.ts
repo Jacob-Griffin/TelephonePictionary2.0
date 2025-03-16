@@ -49,7 +49,10 @@ export class BYFOGameState {
 
   #gameplayHandles: { clearAll: () => void } & Record<string, number | (() => void)> = {
     clearAll: () => {
-      Object.values(this.#gameplayHandles).forEach(handle => {
+      Object.entries(this.#gameplayHandles).forEach(([name, handle]) => {
+        if (name === 'clearAll') {
+          return;
+        }
         if (typeof handle === 'function') {
           handle();
         } else {
@@ -139,7 +142,30 @@ export class BYFOGameState {
 
   #handleGameOver() {
     this.#gameplayHandles.clearAll();
+    this.clearBackups();
     this.state = 'finished';
+  }
+
+  get backupKey() {
+    return `gameplay#${this.gameid}@${this.round}`;
+  }
+
+  getBackup() {
+    localStorage.getItem(this.backupKey);
+  }
+
+  setBackup(data?: string) {
+    if (!data) {
+      localStorage.removeItem(this.backupKey);
+      return;
+    }
+    localStorage.setItem(this.backupKey, data);
+  }
+
+  clearBackups() {
+    for (let i = 0; i < (this.staticRoundInfo?.lastRound ?? 0); i++) {
+      localStorage.removeItem(`gameplay#${this.gameid}@${i}`);
+    }
   }
 
   public async submitRound(data?: string | Blob) {
@@ -151,12 +177,17 @@ export class BYFOGameState {
     }
     this.submitting = true;
     const forced = this.currentTimeRemaining < 0;
+    let error;
     try {
       await this.#firebase.submitRound(this.gameid, this.self, this.round, data, this.#staticRoundInfo, forced);
     } catch (e) {
       console.error(e);
+      error = e;
     } finally {
       this.submitting = false;
+    }
+    if (error) {
+      return { error };
     }
   }
   //#region readonly

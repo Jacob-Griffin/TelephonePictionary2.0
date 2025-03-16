@@ -87,6 +87,9 @@ export default class BYFOPlayerList extends LitElement {
         grid-template-columns: max-content;
         grid-auto-flow: row;
         grid-auto-rows: 2.25rem;
+        :not(.with-status) > p {
+          text-align: center;
+        }
       }
       section.with-status {
         grid-template-columns: 2ch max-content;
