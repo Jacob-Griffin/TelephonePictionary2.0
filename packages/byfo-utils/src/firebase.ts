@@ -616,7 +616,7 @@ export class BYFOFirebaseAdapter {
    * @returns Card data, or null if it doesn't exist
    */
   async fetchCard(gameid: number, target: string, round: number) {
-    return this.getRef(`game/${gameid}/stacks/${target}/${round}`);
+    return this.getRef(`game/${gameid}/stacks/${encodePath(target)}/${round}`);
   }
 
   async getHost(gameid: number): Promise<string> {

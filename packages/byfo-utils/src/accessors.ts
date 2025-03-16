@@ -1,4 +1,4 @@
-export function useAccessor<T extends { accessorList: (keyof T)[] }>(
+export function useAccessor<T extends { accessorList: readonly (keyof T)[] }>(
   context: T & { _store?: { [K in keyof T]?: T[K] }; _watcherMap?: Map<keyof T, { [id: string]: (v: T[keyof T]) => void }> },
 ) {
   context._store = {};
@@ -21,7 +21,7 @@ export function useAccessor<T extends { accessorList: (keyof T)[] }>(
     }
   }
 
-  return function on<K extends (typeof context.accessorList)[number]>(prop: K, fn: (v: T[K]) => void, { instant }: { instant?: boolean } = {}): () => void {
+  return function on<K extends T['accessorList'][number]>(prop: K, fn: (v: T[K]) => void, { instant }: { instant?: boolean } = {}): () => void {
     const watchers = this._watcherMap.get(prop) ?? {};
     let id = Math.floor(Math.random() * 10000).toString();
     while (id in watchers) {

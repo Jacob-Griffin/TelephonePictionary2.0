@@ -1,7 +1,7 @@
 import { installRootStyles } from '@byfo/themes';
 import { LitElement, TemplateResult, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { BYFOFirebaseAdapter, BYFOGameState, BYFOStore, emitRedirect, GameStateError, RouteResult } from 'byfo-utils';
+import { BYFOFirebaseAdapter, BYFOGameState, BYFOStore, emitRedirect, GameStateError, RouteResult, StaticRoundInfo } from 'byfo-utils';
 import { choose } from 'lit/directives/choose.js';
 import { consume } from '@lit/context';
 import { firebaseContext, routeContext, storeContext } from '../context';
@@ -18,12 +18,17 @@ export class ByfoAppGameplay extends LitElement {
     super.connectedCallback();
     installRootStyles(this.shadowRoot!);
     this.state = new BYFOGameState(this.firebase, this.route.arg, this.store.username);
-    this.state.initialize().catch(e => {
-      if (e instanceof GameStateError) {
-        emitRedirect(this, { route: e.destination, arg: e.destinationArg });
-      }
-    });
+    this.state
+      .initialize()
+      .catch(e => {
+        if (e instanceof GameStateError) {
+          emitRedirect(this, { route: e.destination, arg: e.destinationArg });
+        }
+      })
+      .then(() => (this.staticRoundInfo = this.state?.staticRoundInfo));
     this.state?.on('currentTimeRemaining', t => this.handleTime(t));
+    this.state?.on('state', () => this.requestUpdate());
+    this.state?.on('recievedCard', () => this.requestUpdate());
     this.watchMode.observe(this);
   }
 
@@ -45,6 +50,7 @@ export class ByfoAppGameplay extends LitElement {
   });
 
   @state() timeLeft?: number;
+  @state() staticRoundInfo?: StaticRoundInfo;
 
   @consume({ context: firebaseContext })
   firebase!: BYFOFirebaseAdapter;
@@ -98,7 +104,7 @@ export class ByfoAppGameplay extends LitElement {
       ['waiting', this.renderWaiting.bind(this)],
     ];
     return html`<section class="content">
-      <h2>Round ${(this.state?.round ?? 0) + 1}/${(this.state?.staticRoundInfo?.lastRound ?? 0) + 1}</h2>
+      <h2>Round ${(this.state?.round ?? 0) + 1}/${(this.staticRoundInfo?.lastRound ?? 0) + 1}</h2>
       ${choose(this.state?.state, stateMap, () => html``)}
     </section>`;
   }
@@ -116,6 +122,9 @@ export class ByfoAppGameplay extends LitElement {
       section.timer {
         padding: 0.5rem;
         width: min-content;
+      }
+      h2 {
+        margin: 0;
       }
       section.content {
         display: flex;

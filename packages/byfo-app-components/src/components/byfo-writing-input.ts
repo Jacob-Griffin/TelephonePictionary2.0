@@ -8,28 +8,25 @@ import { applicationRules } from '@byfo/themes';
 @customElement('byfo-writing-input')
 export class BYFOWritingInput extends LitElement {
   @property() gameState?: BYFOGameState;
-  backedUp = this.gameState?.getBackup() ?? '';
-
-  protected shouldUpdate(_changedProperties: PropertyValues): boolean {
-    if (_changedProperties.has('backedUp') && _changedProperties.size === 1) {
-      return false;
-    }
-    return true;
-  }
 
   submit() {
     try {
       this.gameState?.submitRound(this.text);
-    } catch {}
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   connectedCallback(): void {
     super.connectedCallback();
-    if (this.backedUp) {
-      this.text = this.backedUp;
-      this.text.trim().length > 0 && this.text.length < (this.gameState?.config.textboxMaxCharacters ?? 288);
-    }
+    this.text = this.gameState?.getBackup() ?? '';
     this.gameState?.on('currentTimeRemaining', t => (t && t < 0 ? this.submit() : null));
+  }
+
+  protected firstUpdated(_changedProperties: PropertyValues): void {
+    const textarea = this.shadowRoot!.getElementById('text-input')! as HTMLTextAreaElement;
+    textarea.focus();
+    textarea.selectionStart = textarea.selectionEnd = textarea.innerText.length - 1;
   }
 
   #text: string = '';
@@ -38,6 +35,7 @@ export class BYFOWritingInput extends LitElement {
   }
   set text(v: string) {
     this.#text = v;
+    this.gameState?.setBackup(v);
     if (this.text.trim().length > 0 && this.text.length < (this.gameState?.config.textboxMaxCharacters ?? 288)) {
       this.textValid ||= true;
     } else {
@@ -51,9 +49,9 @@ export class BYFOWritingInput extends LitElement {
       this.textLines = newLines;
     }
   }
-  @state() textValid: boolean = this.text.trim().length > 0 && this.text.length < (this.gameState?.config.textboxMaxCharacters ?? 288);
-  @state() textLength: number = this.backedUp?.length ?? 0;
-  @state() textLines: number = (this.backedUp?.match(/\n/g)?.length ?? 0) + 1;
+  @state() textValid: boolean = false;
+  @state() textLength: number = 0;
+  @state() textLines: number = 1;
   handleInput = (e: InputEvent) => {
     this.text = (e.target as HTMLInputElement).value;
   };
@@ -68,7 +66,7 @@ export class BYFOWritingInput extends LitElement {
 
   renderTextBox() {
     return html`<div id="text-input-wrapper">
-      <textarea id="text-input" rows=${this.textLines} value=${this.text} placeholder=${this.placeholderText} @input=${this.handleInput}></textarea>
+      <textarea id="text-input" rows=${this.textLines} value=${this.text} placeholder=${this.placeholderText} @input=${this.handleInput}>${this.text}</textarea>
       <div id="character-limit-count" class=${this.text.length > (this.gameState?.config.textboxMaxCharacters ?? 288) ? 'danger' : ''}>
         ${this.textLength}/${this.gameState?.config.textboxMaxCharacters ?? 288}
       </div>

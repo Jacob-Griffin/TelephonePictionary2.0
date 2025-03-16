@@ -1,6 +1,6 @@
 import { config as defaultConfig, BYFOConfig } from './config';
 import { BYFOFirebaseAdapter, RoundContent, RoundData, StaticRoundInfo } from './firebase';
-import { isValidGameId, isValidUsername } from './general';
+import { encodePath, isValidGameId, isValidUsername } from './general';
 import { useAccessor } from './accessors';
 
 export class BYFOGameState {
@@ -134,7 +134,7 @@ export class BYFOGameState {
       this.state = 'finished';
       return;
     }
-    if (data[this.self] >= this.round) {
+    if (data[encodePath(this.self)] >= this.round) {
       this.state = 'waiting';
     }
     this.playersReady = Object.fromEntries(Object.entries(data).map(([player, round]) => [player, round >= this.round]));
@@ -151,7 +151,7 @@ export class BYFOGameState {
   }
 
   getBackup() {
-    localStorage.getItem(this.backupKey);
+    return localStorage.getItem(this.backupKey);
   }
 
   setBackup(data?: string) {
@@ -248,7 +248,7 @@ export class BYFOGameState {
   recievedCard?: RoundContent;
   submitting?: boolean;
 
-  accessorList: (keyof BYFOGameState)[] = ['round', 'currentTimeRemaining', 'endtime', 'players', 'recievedCard', 'state', 'submitting'];
+  accessorList = ['round', 'currentTimeRemaining', 'endtime', 'players', 'recievedCard', 'state', 'submitting'] as const;
   on = useAccessor<BYFOGameState>(this);
   //#endregion
 }

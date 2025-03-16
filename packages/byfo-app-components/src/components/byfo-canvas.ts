@@ -18,6 +18,8 @@ const buttonSizeRem = 4.5;
 const gapRem = 1;
 const buttonGroupRem = 2 * buttonSizeRem + gapRem;
 
+const nop = () => {};
+
 @customElement('byfo-canvas')
 export class BYFOCanvas extends LitElement {
   #canvas: Ref<HTMLCanvasElement> = createRef();
@@ -27,28 +29,10 @@ export class BYFOCanvas extends LitElement {
   box?: DOMRect;
   state?: BYFOCanvasState;
 
-  get backupKey() {
-    return `gameplay#${this.gameState?.gameid}@${this.gameState?.round}`;
-  }
-  get backup() {
-    if (this.backupKey) {
-      return {
-        set: (data?: string) => {
-          if (!data) {
-            localStorage.removeItem(this.backupKey!);
-            return;
-          }
-          localStorage.setItem(this.backupKey!, data);
-        },
-        get: () => localStorage.getItem(this.backupKey!),
-      };
-    } else {
-      return {
-        set: (_data?: string) => void null,
-        get: () => null,
-      };
-    }
-  }
+  backup = {
+    get: this.gameState?.getBackup ?? nop,
+    set: this.gameState?.setBackup ?? nop,
+  };
 
   @property() gameState?: BYFOGameState;
 
@@ -56,22 +40,28 @@ export class BYFOCanvas extends LitElement {
     return this.state?.getImage();
   }
 
-  async submit() {
-    await this.gameState?.submitRound(await this.getImage()).then(r => {
+  submit = async () => {
+    const image = await this.getImage();
+    await this.gameState?.submitRound(image).then(r => {
       if (!r || !('error' in r)) {
         this.backup.set();
       }
     });
-  }
+  };
 
   get canSubmit() {
-    return !this.gameState?.submitting && (this.state?.paths.length ?? 0) > 0;
+    return !this.gameState?.submitting && (this.state?.paths.length ?? 0) > 1;
   }
 
   protected firstUpdated(_changedProperties: PropertyValues): void {
     const backupdata = this.backup.get() ?? undefined;
     this.state = new BYFOCanvasState(this.canvas, { internalHeight, internalWidth }, backupdata);
-    this.state.on('backup', this.backup.set);
+    this.state.on('backup', data => {
+      this.backup.set(data);
+      if (this.state!.paths.length <= 2) {
+        this.requestUpdate();
+      }
+    });
     this.state.on('currentWidth', v => (this.currentWidth = v));
     this.state.on('mode', v => (this.mode = v));
     this.mode = this.state.mode;
@@ -188,7 +178,7 @@ export class BYFOCanvas extends LitElement {
   renderControls = () => {
     const buttons = (this.constructor as typeof BYFOCanvas).buttons;
     return html`<section class="controls">
-      <section class="backdrop">${this.gameState?.timeRemainingString}</section>
+      <section class="backdrop">${this.gameState?.timeRemainingString ?? html`<span></span>`}</section>
       ${map(buttons, this.renderButtonGroup)}<button @click=${this.submit} class="wide" ?disabled=${!this.canSubmit}>Submit</button>
     </section>`;
   };
@@ -248,6 +238,9 @@ export class BYFOCanvas extends LitElement {
           grid-column: span 3;
           align-self: center;
           justify-self: center;
+          &:has(span) {
+            background-color: transparent;
+          }
         }
         .wide {
           width: ${buttonGroupRem}rem;
