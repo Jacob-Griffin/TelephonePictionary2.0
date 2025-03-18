@@ -1,7 +1,15 @@
 import { installRootStyles } from '@byfo/themes';
 import { LitElement, TemplateResult, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { BYFOFirebaseAdapter, BYFOGameState, BYFOStore, emitRedirect, GameStateError, RouteResult, StaticRoundInfo } from 'byfo-utils';
+import {
+  BYFOFirebaseAdapter,
+  BYFOGameState,
+  BYFOStore,
+  emitRedirect,
+  GameStateError,
+  RouteResult,
+  StaticRoundInfo,
+} from 'byfo-utils';
 import { choose } from 'lit/directives/choose.js';
 import { consume } from '@lit/context';
 import { firebaseContext, routeContext, storeContext } from '../context';
@@ -95,14 +103,18 @@ export class ByfoAppGameplay extends LitElement {
     return backdrop ? html`<section class="backdrop timer">${t}</section>` : t;
   }
   renderDrawingRound() {
-    return html`${this.renderFrom()} <byfo-canvas class=${this.canvasClass} .gameState=${this.state}></byfo-canvas>`;
+    return html`${this.renderFrom()}
+      <byfo-canvas class=${this.canvasClass} .gameState=${this.state}></byfo-canvas>`;
   }
   renderWritingRound() {
-    return html`${this.renderFrom()} ${this.renderTimer(true)} <byfo-writing-input .gameState=${this.state}></byfo-writing-input>`;
+    return html`${this.renderFrom()} ${this.renderTimer(true)}
+      <byfo-writing-input .gameState=${this.state}></byfo-writing-input>`;
   }
   renderWaiting() {
     return html`${this.renderTimer(true)}
-      <byfo-player-list class="backdrop" .statusMap=${this.state!.playersReady}><span slot="pretext">Waiting for players</span></byfo-player-list>`;
+      <byfo-player-list class="backdrop" .statusMap=${this.state!.playersReady}
+        ><span slot="pretext">Waiting for players</span></byfo-player-list
+      >`;
   }
 
   render() {

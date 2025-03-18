@@ -15,7 +15,12 @@ export function parseByToken(content: string) {
     const listMatch = line.match(/^(  *|\t*)- /);
     if (headermatch) {
       listToken = undefined;
-      const token: Token<'header'> = { type: 'header', meta: headermatch[1]!.length, children: [], parent: tree };
+      const token: Token<'header'> = {
+        type: 'header',
+        meta: headermatch[1]!.length,
+        children: [],
+        parent: tree,
+      };
       line = line.slice(headermatch[0].length);
       token.children.push(...parseLine(line, token));
       tree.children.push(token);

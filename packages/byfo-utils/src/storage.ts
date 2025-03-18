@@ -12,7 +12,8 @@ export class BYFOStore {
     this.themeController.apply();
   }
 
-  changeEvent = (setting: string, value: string) => new CustomEvent('tp-settings-changed', { detail: { setting, value } });
+  changeEvent = (setting: string, value: string) =>
+    new CustomEvent('tp-settings-changed', { detail: { setting, value } });
 
   theme: ThemeId = (localStorage.getItem('theme') as ThemeId) ?? 'classic';
   setTheme = (v: ThemeId) => {
@@ -121,7 +122,9 @@ export class BYFOStore {
     if (!branchSwitchData) {
       return;
     }
-    const { rejoinNumber, hosting, gameid, username, theme, landscapeDismissed, customStyle } = JSON.parse(decodeURIComponent(branchSwitchData));
+    const { rejoinNumber, hosting, gameid, username, theme, landscapeDismissed, customStyle } = JSON.parse(
+      decodeURIComponent(branchSwitchData),
+    );
     const newLocation = window.location.href.replace(branchSwitchRegex, '');
     window.location.replace(newLocation);
     if (rejoinNumber) this.setRejoinNumber(rejoinNumber);

@@ -112,7 +112,8 @@ export const icons = {
     if (!width || !(width in squiggleWidth)) {
       width = 'small';
     }
-    const internalStrokeWidth = minSquiggle + (maxSquiggle - minSquiggle) * squiggleWidth[width as keyof typeof squiggleWidth];
+    const internalStrokeWidth =
+      minSquiggle + (maxSquiggle - minSquiggle) * squiggleWidth[width as keyof typeof squiggleWidth];
     return svg`
     <svg viewBox="0 0 12.7 12.7" xmlns="http://www.w3.org/2000/svg">
       <g>

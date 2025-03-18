@@ -1,6 +1,31 @@
-import { setDoc, doc, getDocFromServer, getFirestore, type Firestore, connectFirestoreEmulator } from 'firebase/firestore';
-import { ref as rtdbRef, get, set, onValue, remove, getDatabase, onDisconnect, DataSnapshot, type Database, connectDatabaseEmulator } from 'firebase/database';
-import { getDownloadURL, ref as storageRef, uploadBytes, getStorage, type FirebaseStorage, connectStorageEmulator } from 'firebase/storage';
+import {
+  setDoc,
+  doc,
+  getDocFromServer,
+  getFirestore,
+  type Firestore,
+  connectFirestoreEmulator,
+} from 'firebase/firestore';
+import {
+  ref as rtdbRef,
+  get,
+  set,
+  onValue,
+  remove,
+  getDatabase,
+  onDisconnect,
+  DataSnapshot,
+  type Database,
+  connectDatabaseEmulator,
+} from 'firebase/database';
+import {
+  getDownloadURL,
+  ref as storageRef,
+  uploadBytes,
+  getStorage,
+  type FirebaseStorage,
+  connectStorageEmulator,
+} from 'firebase/storage';
 import { FirebaseOptions, initializeApp } from 'firebase/app';
 import { BYFOConfig, config as defaultGameConfig } from './config';
 import { decodePath, encodePath, validUsername } from './general';
@@ -516,19 +541,29 @@ export class BYFOFirebaseAdapter {
     }
     this.lastSubmission = Date.now();
     const contentType = round % 2 === 0 ? 'text' : 'image';
-    if ((contentType === 'text' && rawContent instanceof Blob) || (contentType === 'image' && typeof rawContent === 'string')) {
+    if (
+      (contentType === 'text' && rawContent instanceof Blob) ||
+      (contentType === 'image' && typeof rawContent === 'string')
+    ) {
       if (!forced) {
         throw new Error();
       }
       rawContent = this.getDefaultContent(contentType);
     }
-    if (contentType === 'text' && typeof rawContent === 'string' && rawContent.length > this.gameConfig.textboxMaxCharacters) {
+    if (
+      contentType === 'text' &&
+      typeof rawContent === 'string' &&
+      rawContent.length > this.gameConfig.textboxMaxCharacters
+    ) {
       if (!forced) {
         throw new Error();
       }
       rawContent = rawContent.slice(0, this.gameConfig.textboxMaxCharacters);
     }
-    const content: string = rawContent instanceof Blob ? await this.uploadImage(gameid, name, round, rawContent) : rawContent || this.getDefaultContent(contentType);
+    const content: string =
+      rawContent instanceof Blob
+        ? await this.uploadImage(gameid, name, round, rawContent)
+        : rawContent || this.getDefaultContent(contentType);
     const savedContent: RoundContent = { contentType, content };
 
     const stackRef = this.ref(`game/${gameid}/stacks/${name}/${round}`);
@@ -556,7 +591,9 @@ export class BYFOFirebaseAdapter {
     const roundRef = this.ref(`game/${gameid}/round/`);
     const newRoundData: RoundData = {
       roundnumber: round + 1,
-      endTime: this.internetTime ? this.now + staticRoundInfo.roundLength : Date.now() + staticRoundInfo.roundLength + this.serverOffset,
+      endTime: this.internetTime
+        ? this.now + staticRoundInfo.roundLength
+        : Date.now() + staticRoundInfo.roundLength + this.serverOffset,
     };
     if (staticRoundInfo.roundLength === -1) newRoundData.endTime = -1;
     await set(roundRef, newRoundData);

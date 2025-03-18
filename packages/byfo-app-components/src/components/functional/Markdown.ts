@@ -8,7 +8,9 @@ export function ByfoMarkdown(contentIn: string, withAdvanced?: boolean) {
 }
 
 function renderTokens(tree: Token<TokenType | 'root'>, withAdvanced?: boolean): TemplateResult {
-  const strings = tree.children.map(v => (typeof v === 'string' ? html`${v}` : renderTokens(v, withAdvanced)));
+  const strings = tree.children.map(v =>
+    typeof v === 'string' ? html`${v}` : renderTokens(v, withAdvanced),
+  );
   const inner = html`${map(strings, v => (tree.type === 'root' ? html`${v}<br />` : v))}`;
   if (tree.type === 'header') {
     if (!withAdvanced) {

@@ -65,7 +65,10 @@ export class ByfoAppPage extends LitElement {
   render() {
     return html`<section class=${this.route.route === 'home' ? 'header invisible' : 'header'}>
         <div id="small-logo"></div>
-        <byfo-modal id="settings"><span slot="buttontext">${ByfoIcon('gear')}</span><byfo-settings slot="content" .store=${this.store}></byfo-settings></byfo-modal>
+        <byfo-modal id="settings"
+          ><span slot="buttontext">${ByfoIcon('gear')}</span
+          ><byfo-settings slot="content" .store=${this.store}></byfo-settings
+        ></byfo-modal>
       </section>
       <main @byforedirect=${this.handleRedirect}>${choose(this.route.route, routeMap, () => html``)}</main>`;
   }

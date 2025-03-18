@@ -55,7 +55,9 @@ export class Theme {
     document.adoptedStyleSheets = [...document.adoptedStyleSheets, this._sheet];
   }
   apply() {
-    const attributes = document.documentElement.getAttributeNames().filter(name => name.startsWith('byfo-theme'));
+    const attributes = document.documentElement
+      .getAttributeNames()
+      .filter(name => name.startsWith('byfo-theme'));
     for (const themetag of attributes) {
       document.documentElement.removeAttribute(themetag);
     }

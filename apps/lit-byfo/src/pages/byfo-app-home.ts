@@ -1,7 +1,13 @@
 import { installRootStyles } from '@byfo/themes';
 import { LitElement, css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { emitRedirect, isValidGameId, isValidUsername, type BYFOFirebaseAdapter, type BYFOStore } from 'byfo-utils';
+import {
+  emitRedirect,
+  isValidGameId,
+  isValidUsername,
+  type BYFOFirebaseAdapter,
+  type BYFOStore,
+} from 'byfo-utils';
 import { firebaseContext, storeContext } from '../context';
 import { consume } from '@lit/context';
 
@@ -111,19 +117,43 @@ export class ByfoAppHome extends LitElement {
       <section id="route-buttons">
         <byfo-modal id="join" class="important big-button"
           ><span slot="buttontext">Join Game</span
-          ><byfo-form slot="content" heading="Join a game" buttonLabel="Join" .fields=${this.forms.join.fields} .onSubmit=${this.forms.join.action}></byfo-form
+          ><byfo-form
+            slot="content"
+            heading="Join a game"
+            buttonLabel="Join"
+            .fields=${this.forms.join.fields}
+            .onSubmit=${this.forms.join.action}
+          ></byfo-form
         ></byfo-modal>
         <byfo-modal id="host" class="big-button"
           ><span slot="buttontext">Host Game</span
-          ><byfo-form slot="content" heading="Host a game" buttonLabel="Host" .fields=${this.forms.host.fields} .onSubmit=${this.forms.host.action}></byfo-form
+          ><byfo-form
+            slot="content"
+            heading="Host a game"
+            buttonLabel="Host"
+            .fields=${this.forms.host.fields}
+            .onSubmit=${this.forms.host.action}
+          ></byfo-form
         ></byfo-modal>
         <byfo-modal id="review" class="big-button"
           ><span slot="buttontext">Review Finished Game</span
-          ><byfo-form slot="content" heading="Review a finished game" buttonLabel="Review" .fields=${this.forms.review.fields} .onSubmit=${this.forms.review.action}></byfo-form
+          ><byfo-form
+            slot="content"
+            heading="Review a finished game"
+            buttonLabel="Review"
+            .fields=${this.forms.review.fields}
+            .onSubmit=${this.forms.review.action}
+          ></byfo-form
         ></byfo-modal>
         <byfo-modal id="search" class="big-button"
           ><span slot="buttontext">Search Games</span
-          ><byfo-form slot="content" heading="Search games" buttonLabel="Search" .fields=${this.forms.search.fields} .onSubmit=${this.forms.search.action}></byfo-form
+          ><byfo-form
+            slot="content"
+            heading="Search games"
+            buttonLabel="Search"
+            .fields=${this.forms.search.fields}
+            .onSubmit=${this.forms.search.action}
+          ></byfo-form
         ></byfo-modal>
       </section>`;
   }

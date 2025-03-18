@@ -1,7 +1,14 @@
 import { installRootStyles } from '@byfo/themes';
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { BYFOFirebaseAdapter, BYFOStore, emitRedirect, GameStatus, PlayerList, RouteResult } from 'byfo-utils';
+import {
+  BYFOFirebaseAdapter,
+  BYFOStore,
+  emitRedirect,
+  GameStatus,
+  PlayerList,
+  RouteResult,
+} from 'byfo-utils';
 import { buttonStyle, inputStyle } from '@byfo/components/styles';
 import { firebaseContext, routeContext, storeContext } from '../context';
 import { consume } from '@lit/context';
@@ -91,7 +98,8 @@ export class ByfoAppLobby extends LitElement {
       this.time = Number.POSITIVE_INFINITY;
       return;
     }
-    const { minutes, seconds }: Record<string, string | number> = value.match(/^(?:(?<minutes>\d+)m)?(?:(?<seconds>\d+)s)?$/)?.groups ?? {};
+    const { minutes, seconds }: Record<string, string | number> =
+      value.match(/^(?:(?<minutes>\d+)m)?(?:(?<seconds>\d+)s)?$/)?.groups ?? {};
     if (!minutes && !seconds) {
       this.time = -1;
       return;
@@ -130,9 +138,13 @@ export class ByfoAppLobby extends LitElement {
 
   render() {
     return html`<h2>Game ${this.route.arg}</h2>
-      <button @click=${this.copyJoinLink} ?active=${this.showCopied}>${this.showCopied ? '✓ Copied!' : '📋 Copy invite link'}</button>
+      <button @click=${this.copyJoinLink} ?active=${this.showCopied}>
+        ${this.showCopied ? '✓ Copied!' : '📋 Copy invite link'}
+      </button>
       <byfo-player-list .countPlayers=${true} .players=${this.players} .config=${this.config} class="backdrop"
-        ><span slot="pretext">Waiting for players. Invite players with the game number or by sharing the join link above</span></byfo-player-list
+        ><span slot="pretext"
+          >Waiting for players. Invite players with the game number or by sharing the join link above</span
+        ></byfo-player-list
       >
       ${this.hosting
         ? html`<p>Round Length</p>

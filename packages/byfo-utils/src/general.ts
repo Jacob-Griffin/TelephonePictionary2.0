@@ -25,7 +25,10 @@ export function sortNames(names: string[]) {
  */
 export function sortNamesBy<T extends { [key: string]: unknown }>(names: T[], sortKey: keyof T): typeof names;
 export function sortNamesBy<T extends unknown[][]>(names: T, sortKey: number): T;
-export function sortNamesBy<T extends { [key: string | number]: unknown }>(names: (Record<string, unknown> | unknown[])[], sortKey: string | number) {
+export function sortNamesBy<T extends { [key: string | number]: unknown }>(
+  names: (Record<string, unknown> | unknown[])[],
+  sortKey: string | number,
+) {
   const keyMap = new Map<string, T>();
   const nameArray: string[] = [];
   names.forEach((obj: T) => {
@@ -36,7 +39,9 @@ export function sortNamesBy<T extends { [key: string | number]: unknown }>(names
     nameArray.push(name);
     keyMap.set(name, obj);
   });
-  const keyOrder = nameArray.sort((a: string, b: string) => a.localeCompare(b, 'en', { sensitivity: 'base' }));
+  const keyOrder = nameArray.sort((a: string, b: string) =>
+    a.localeCompare(b, 'en', { sensitivity: 'base' }),
+  );
   return keyOrder.map(name => keyMap.get(name));
 }
 
@@ -63,7 +68,12 @@ export function calculatePlayerNameWidth(players: Player[]) {
  * @returns The string with no invalid characters
  */
 export function encodePath(path: string) {
-  return path.replaceAll('.', '%2E').replaceAll('#', '%23').replaceAll('$', '%24').replaceAll('[', '%5B').replaceAll(']', '%5D');
+  return path
+    .replaceAll('.', '%2E')
+    .replaceAll('#', '%23')
+    .replaceAll('$', '%24')
+    .replaceAll('[', '%5B')
+    .replaceAll(']', '%5D');
 }
 
 /**
@@ -73,7 +83,12 @@ export function encodePath(path: string) {
  * @returns A string with certain html encoding undone
  */
 export function decodePath(path: string) {
-  return path.replaceAll('%2E', '.').replaceAll('%23', '#').replaceAll('%24', '$').replaceAll('%5B', '[').replaceAll('%5D', ']');
+  return path
+    .replaceAll('%2E', '.')
+    .replaceAll('%23', '#')
+    .replaceAll('%24', '$')
+    .replaceAll('%5B', '[')
+    .replaceAll('%5D', ']');
 }
 //#endregion Strings
 

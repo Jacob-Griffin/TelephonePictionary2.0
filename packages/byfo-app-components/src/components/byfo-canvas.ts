@@ -53,7 +53,9 @@ export class BYFOCanvas extends LitElement {
   };
 
   get canSubmit() {
-    return !this.submitting && (this.state?.paths.length ?? 0) > 1 && this.state?.paths.at(-1)?.clear === undefined;
+    return (
+      !this.submitting && (this.state?.paths.length ?? 0) > 1 && this.state?.paths.at(-1)?.clear === undefined
+    );
   }
 
   protected firstUpdated(_changedProperties: PropertyValues): void {
@@ -175,7 +177,11 @@ export class BYFOCanvas extends LitElement {
 
   renderButton = (button: ControlButton) => {
     const state = button.state?.split('::') as [keyof BYFOCanvas, string] | undefined;
-    return html`<button @click=${this?.buttonAction(button.action, button.arg)} active=${(state && this?.[state[0]] === state[1]) || nothing} class=${button.class}>
+    return html`<button
+      @click=${this?.buttonAction(button.action, button.arg)}
+      active=${(state && this?.[state[0]] === state[1]) || nothing}
+      class=${button.class}
+    >
       ${ByfoIcon(button.icon, button.arg as string)}
     </button>`;
   };
@@ -191,12 +197,19 @@ export class BYFOCanvas extends LitElement {
     const buttons = (this.constructor as typeof BYFOCanvas).buttons;
     return html`<section class="controls">
       <section class="backdrop">${this.gameState?.timeRemainingString ?? html`<span></span>`}</section>
-      ${map(buttons, this.renderButtonGroup)}<button @click=${this.submit} class="wide" ?disabled=${!this.canSubmit}>${this.submitting ? 'Submitting...' : 'Submit'}</button>
+      ${map(buttons, this.renderButtonGroup)}<button
+        @click=${this.submit}
+        class="wide"
+        ?disabled=${!this.canSubmit}
+      >
+        ${this.submitting ? 'Submitting...' : 'Submit'}
+      </button>
     </section>`;
   };
 
   render() {
-    return html`<canvas width=${internalWidth} height=${internalHeight} ${ref(this.#canvas)}></canvas>${this.renderControls()}`;
+    return html`<canvas width=${internalWidth} height=${internalHeight} ${ref(this.#canvas)}></canvas
+      >${this.renderControls()}`;
   }
 
   static styles = [

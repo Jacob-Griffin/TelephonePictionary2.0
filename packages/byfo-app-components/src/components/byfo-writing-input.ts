@@ -37,7 +37,10 @@ export class BYFOWritingInput extends LitElement {
   set text(v: string) {
     this.#text = v;
     this.gameState?.setBackup(v);
-    if (this.text.trim().length > 0 && this.text.length < (this.gameState?.config.textboxMaxCharacters ?? 288)) {
+    if (
+      this.text.trim().length > 0 &&
+      this.text.length < (this.gameState?.config.textboxMaxCharacters ?? 288)
+    ) {
       this.textValid ||= true;
     } else {
       this.textValid &&= false;
@@ -68,8 +71,19 @@ export class BYFOWritingInput extends LitElement {
 
   renderTextBox() {
     return html`<div id="text-input-wrapper">
-      <textarea id="text-input" rows=${this.textLines} value=${this.text} placeholder=${this.placeholderText} @input=${this.handleInput}>${this.text}</textarea>
-      <div id="character-limit-count" class=${this.text.length > (this.gameState?.config.textboxMaxCharacters ?? 288) ? 'danger' : ''}>
+      <textarea
+        id="text-input"
+        rows=${this.textLines}
+        value=${this.text}
+        placeholder=${this.placeholderText}
+        @input=${this.handleInput}
+      >
+${this.text}</textarea
+      >
+      <div
+        id="character-limit-count"
+        class=${this.text.length > (this.gameState?.config.textboxMaxCharacters ?? 288) ? 'danger' : ''}
+      >
         ${this.textLength}/${this.gameState?.config.textboxMaxCharacters ?? 288}
       </div>
     </div>`;
@@ -77,7 +91,9 @@ export class BYFOWritingInput extends LitElement {
 
   render() {
     return html`${this.renderTextBox()}
-      <button class="big" @click=${this.submit} ?disabled=${!this.textValid || this.submitting}>${this.submitting ? 'Submitting...' : 'Submit'}</button>`;
+      <button class="big" @click=${this.submit} ?disabled=${!this.textValid || this.submitting}>
+        ${this.submitting ? 'Submitting...' : 'Submit'}
+      </button>`;
   }
   static styles = [
     css`

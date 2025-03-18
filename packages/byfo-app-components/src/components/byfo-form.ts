@@ -87,11 +87,20 @@ export class BYFOForm extends LitElement {
                 !!field.label,
                 () => html`<p>${field.label}</p>`,
                 () => html``,
-              )} <input type="text" @input=${this.handleInput} value=${field.initial} id=${`field-${field.id}`} class=${!field.label ? 'span' : ''} />`,
+              )}
+              <input
+                type="text"
+                @input=${this.handleInput}
+                value=${field.initial}
+                id=${`field-${field.id}`}
+                class=${!field.label ? 'span' : ''}
+              />`,
         )}
       </section>
       <p class="error">${this.error ?? ''}</p>
-      <button class="big" @click=${this.submit} ?disabled=${this.submissionDisabled} part="submit-button">${this.buttonLabel}</button>`;
+      <button class="big" @click=${this.submit} ?disabled=${this.submissionDisabled} part="submit-button">
+        ${this.buttonLabel}
+      </button>`;
   }
 
   static styles = [

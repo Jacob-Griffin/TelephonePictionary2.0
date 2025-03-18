@@ -8,7 +8,9 @@ class AccessorTest {
   obj?: Record<string, string>;
   arr?: string[];
 
-  on = useAccessor<AccessorTest>(['num', 'str', 'bool', 'obj', 'arr'], this);
+  accessorList = ['num', 'str', 'bool', 'obj', 'arr'] as const;
+
+  on = useAccessor<AccessorTest>(this);
 }
 
 class AccessorTestNotAll {
@@ -18,7 +20,9 @@ class AccessorTestNotAll {
   obj?: Record<string, string>;
   arr?: string[];
 
-  on = useAccessor<AccessorTestNotAll>(['num', 'str', 'bool'], this);
+  accessorList = ['num', 'str', 'bool'] as const;
+
+  on = useAccessor<AccessorTestNotAll>(this);
 }
 
 test('Accessor initializes', () => {

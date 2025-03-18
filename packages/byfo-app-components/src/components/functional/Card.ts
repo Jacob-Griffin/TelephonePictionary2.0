@@ -1,7 +1,12 @@
 import { html, css, TemplateResult } from 'lit';
 import { ByfoMarkdown } from './Markdown';
 
-export function ByfoCard(content: string, type: 'text' | 'image', author: string, alignment?: 'left' | 'right'): TemplateResult {
+export function ByfoCard(
+  content: string,
+  type: 'text' | 'image',
+  author: string,
+  alignment?: 'left' | 'right',
+): TemplateResult {
   return html`<article class=${`card ${type} ${alignment ?? ''}`}>
     ${type === 'text' ? html`<h3>${ByfoMarkdown(content)}</h3>` : html`<img src=${content} />`}
     <div class="name-tag">${author}</div>

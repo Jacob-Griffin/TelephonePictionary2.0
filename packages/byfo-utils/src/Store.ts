@@ -10,7 +10,8 @@ export class TPStore {
     this.readFromWindow();
   }
 
-  changeEvent = (setting: string, value: string) => new CustomEvent('tp-settings-changed', { detail: { setting, value } });
+  changeEvent = (setting: string, value: string) =>
+    new CustomEvent('tp-settings-changed', { detail: { setting, value } });
 
   theme: string = localStorage.getItem('theme') ?? 'classic';
   setTheme = (v: string) => {
@@ -32,8 +33,10 @@ export class TPStore {
 
   customStyle: Record<string, string> = {
     backgroundBlur: localStorage.getItem('backgroundBlur') ?? customStyleDefaults['backgroundBlur'],
-    backgroundBrightness: localStorage.getItem('backgroundBrightness') ?? customStyleDefaults['backgroundBrightness'],
-    backgroundSaturation: localStorage.getItem('backgroundSaturation') ?? customStyleDefaults['backgroundSaturation'],
+    backgroundBrightness:
+      localStorage.getItem('backgroundBrightness') ?? customStyleDefaults['backgroundBrightness'],
+    backgroundSaturation:
+      localStorage.getItem('backgroundSaturation') ?? customStyleDefaults['backgroundSaturation'],
   };
   setCustomStyle = (prop: string, v: string | number) => {
     this.customStyle[prop] = `${v}`;
@@ -155,7 +158,9 @@ export class TPStore {
     if (!branchSwitchData) {
       return;
     }
-    const { rejoinNumber, hosting, gameid, username, theme, landscapeDismissed, customStyle } = JSON.parse(decodeURIComponent(branchSwitchData));
+    const { rejoinNumber, hosting, gameid, username, theme, landscapeDismissed, customStyle } = JSON.parse(
+      decodeURIComponent(branchSwitchData),
+    );
     const newLocation = window.location.href.replace(branchSwitchRegex, '');
     window.location.replace(newLocation);
     if (rejoinNumber) this.setRejoinNumber(rejoinNumber);

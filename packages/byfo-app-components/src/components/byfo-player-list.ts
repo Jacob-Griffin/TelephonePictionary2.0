@@ -53,7 +53,9 @@ export default class BYFOPlayerList extends LitElement {
   }
 
   renderPlayers() {
-    return html`<section class=${this.players ? '' : 'with-status'}>${map(this.displayItems, v => v)}</section>`;
+    return html`<section class=${this.players ? '' : 'with-status'}>
+      ${map(this.displayItems, v => v)}
+    </section>`;
   }
 
   render() {
@@ -62,7 +64,10 @@ export default class BYFOPlayerList extends LitElement {
     }
     const l = this.displayItems.length;
     return html`<p class="info"><slot name="pretext"></slot></p>
-      ${this.renderPlayers()} ${this.countPlayers ? html`<p class="info">${l} player${l !== 1 ? 's' : ''} in game ${this.formatLimit()}</p>` : nothing}`;
+      ${this.renderPlayers()}
+      ${this.countPlayers
+        ? html`<p class="info">${l} player${l !== 1 ? 's' : ''} in game ${this.formatLimit()}</p>`
+        : nothing}`;
   }
 
   static styles = [

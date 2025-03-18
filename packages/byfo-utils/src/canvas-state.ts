@@ -28,7 +28,11 @@ export class BYFOCanvasState {
   #height: number;
   #width: number;
 
-  constructor(src: HTMLCanvasElement, { internalWidth, internalHeight }: { internalWidth: number; internalHeight: number }, data?: string) {
+  constructor(
+    src: HTMLCanvasElement,
+    { internalWidth, internalHeight }: { internalWidth: number; internalHeight: number },
+    data?: string,
+  ) {
     this.#context = src.getContext('2d');
     this.#box = src.getBoundingClientRect();
     this.#src = src;
@@ -127,7 +131,11 @@ export class BYFOCanvasState {
         this.#draw(event);
       }
       //Push the current Path to the path list and final drawing
-      this.paths.push({ path: this.currentPath, size: this.#context.lineWidth, color: this.#context.strokeStyle as string });
+      this.paths.push({
+        path: this.currentPath,
+        size: this.#context.lineWidth,
+        color: this.#context.strokeStyle as string,
+      });
 
       this.currentPath = [];
       this.backup = JSON.stringify(this.paths);

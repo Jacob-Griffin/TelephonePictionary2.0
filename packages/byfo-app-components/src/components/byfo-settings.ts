@@ -39,7 +39,9 @@ export default class BYFOSettings extends LitElement {
   }
 
   renderThemeOption(themeid: ThemeId) {
-    return html`<option value=${themeid} ?selected=${this.store!.theme === themeid}>${themes[themeid].displayName}</option>`;
+    return html`<option value=${themeid} ?selected=${this.store!.theme === themeid}>
+      ${themes[themeid].displayName}
+    </option>`;
   }
 
   handleStyle(e: InputEvent) {

@@ -99,13 +99,22 @@ export class BYFOGameState {
     this.#to = to;
 
     this.players = await this.#firebase.fetchFinishedRounds(this.gameid);
-    this.#gameplayHandles.roundChange = this.#firebase.onRoundChange(this.gameid, this.#handleRoundChange.bind(this));
+    this.#gameplayHandles.roundChange = this.#firebase.onRoundChange(
+      this.gameid,
+      this.#handleRoundChange.bind(this),
+    );
     if (initialRoundData.endTime > 0) {
-      this.#gameplayHandles.timeChange = this.on('endtime', v => (this.currentTimeRemaining = v - this.#firebase.now));
+      this.#gameplayHandles.timeChange = this.on(
+        'endtime',
+        v => (this.currentTimeRemaining = v - this.#firebase.now),
+      );
       this.#gameplayHandles.time = setInterval(this.timeTick, 250);
       this.timeTick();
     }
-    this.#gameplayHandles.whoFinishedChange = this.#firebase.onPlayerStatusChange(this.gameid, this.#handleStatusChange.bind(this));
+    this.#gameplayHandles.whoFinishedChange = this.#firebase.onPlayerStatusChange(
+      this.gameid,
+      this.#handleStatusChange.bind(this),
+    );
 
     this.#staticRoundInfo = await this.#firebase.getStaticRoundInfo(this.gameid);
     this.#initialized.resolve();
@@ -139,7 +148,9 @@ export class BYFOGameState {
     if (data[encodePath(this.self)] >= this.round) {
       this.state = 'waiting';
     }
-    this.playersReady = Object.fromEntries(Object.entries(data).map(([player, round]) => [player, round >= this.round]));
+    this.playersReady = Object.fromEntries(
+      Object.entries(data).map(([player, round]) => [player, round >= this.round]),
+    );
   }
 
   #handleGameOver() {
@@ -181,7 +192,14 @@ export class BYFOGameState {
     const forced = this.currentTimeRemaining < 0;
     let error;
     try {
-      await this.#firebase.submitRound(this.gameid, this.self, this.round, data, this.#staticRoundInfo, forced);
+      await this.#firebase.submitRound(
+        this.gameid,
+        this.self,
+        this.round,
+        data,
+        this.#staticRoundInfo,
+        forced,
+      );
     } catch (e) {
       console.error(e);
       error = e;
@@ -250,7 +268,15 @@ export class BYFOGameState {
   recievedCard?: RoundContent;
   submitting: boolean = false;
 
-  accessorList = ['round', 'currentTimeRemaining', 'endtime', 'players', 'recievedCard', 'state', 'submitting'] as const;
+  accessorList = [
+    'round',
+    'currentTimeRemaining',
+    'endtime',
+    'players',
+    'recievedCard',
+    'state',
+    'submitting',
+  ] as const;
   on = useAccessor<BYFOGameState>(this);
   //#endregion
 }

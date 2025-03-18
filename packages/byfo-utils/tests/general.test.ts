@@ -8,7 +8,11 @@ test('sortNames', () => {
 });
 
 test('sortNamesBy', () => {
-  expect(src.sortNamesBy([{ name: 'a' }, { name: 'c' }, { name: 'b' }], 'name')).toEqual([{ name: 'a' }, { name: 'b' }, { name: 'c' }]);
+  expect(src.sortNamesBy([{ name: 'a' }, { name: 'c' }, { name: 'b' }], 'name')).toEqual([
+    { name: 'a' },
+    { name: 'b' },
+    { name: 'c' },
+  ]);
   expect(
     src.sortNamesBy(
       [
@@ -33,8 +37,16 @@ test('sortNamesBy', () => {
       'id',
     ),
   ).toThrowError('Unexpected non-string value used as name');
-  expect(src.sortNamesBy([{ name: 'a' }, { name: 'C' }, { name: 'b' }], 'name')).toEqual([{ name: 'a' }, { name: 'b' }, { name: 'C' }]);
-  expect(src.sortNamesBy([{ name: 'a' }, { name: 'B' }, { name: 'c' }], 'name')).toEqual([{ name: 'a' }, { name: 'B' }, { name: 'c' }]);
+  expect(src.sortNamesBy([{ name: 'a' }, { name: 'C' }, { name: 'b' }], 'name')).toEqual([
+    { name: 'a' },
+    { name: 'b' },
+    { name: 'C' },
+  ]);
+  expect(src.sortNamesBy([{ name: 'a' }, { name: 'B' }, { name: 'c' }], 'name')).toEqual([
+    { name: 'a' },
+    { name: 'B' },
+    { name: 'c' },
+  ]);
 });
 
 test('encodePath', () => {

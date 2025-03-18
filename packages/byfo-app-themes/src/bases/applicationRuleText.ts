@@ -4,7 +4,8 @@
 import { CustomThemeBase as CustomTheme } from './CustomThemeBase';
 
 // See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#raw_strings
-const css = (strings: TemplateStringsArray, ...values: unknown[]) => String.raw({ raw: strings }, ...values).trim();
+const css = (strings: TemplateStringsArray, ...values: unknown[]) =>
+  String.raw({ raw: strings }, ...values).trim();
 
 export default css`
   :root {
@@ -32,7 +33,8 @@ export default css`
   }
 
   body {
-    backdrop-filter: blur(var(--byfo-custom-blur, ${CustomTheme.defaultBlur})) brightness(var(--byfo-custom-brightness, ${CustomTheme.defaultBrightness}))
+    backdrop-filter: blur(var(--byfo-custom-blur, ${CustomTheme.defaultBlur}))
+      brightness(var(--byfo-custom-brightness, ${CustomTheme.defaultBrightness}))
       saturate(var(--byfo-custom-saturation, ${CustomTheme.defaultSaturation}));
   }
 

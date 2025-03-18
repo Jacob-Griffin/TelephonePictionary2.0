@@ -3,7 +3,13 @@ import { CSSResultGroup, LitElement, css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { buttonStyle } from '@byfo/components/styles';
 import { firebaseContext, routeContext, storeContext } from '../context';
-import { isValidUsername, type RouteResult, type BYFOFirebaseAdapter, type BYFOStore, emitRedirect } from 'byfo-utils';
+import {
+  isValidUsername,
+  type RouteResult,
+  type BYFOFirebaseAdapter,
+  type BYFOStore,
+  emitRedirect,
+} from 'byfo-utils';
 import { consume } from '@lit/context';
 
 @customElement('byfo-app-join')
@@ -39,7 +45,13 @@ export class ByfoAppJoin extends LitElement {
   };
 
   render() {
-    return html`<byfo-form class="backdrop" heading=${`Join game ${this.route.arg}`} buttonLabel="Join" .fields=${this.joinFields} .onSubmit=${this.join}></byfo-form>`;
+    return html`<byfo-form
+      class="backdrop"
+      heading=${`Join game ${this.route.arg}`}
+      buttonLabel="Join"
+      .fields=${this.joinFields}
+      .onSubmit=${this.join}
+    ></byfo-form>`;
   }
 
   static styles?: CSSResultGroup | undefined = [

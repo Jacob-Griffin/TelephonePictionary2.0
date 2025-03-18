@@ -33,9 +33,16 @@ export default class BYFOModal extends LitElement {
   };
 
   render() {
-    return html`<button class=${this.classList.contains('big-button') ? 'big' : ''} @click=${this.openModal} part="openbutton"><slot name="buttontext"></slot></button>
+    return html`<button
+        class=${this.classList.contains('big-button') ? 'big' : ''}
+        @click=${this.openModal}
+        part="openbutton"
+      >
+        <slot name="buttontext"></slot>
+      </button>
       <dialog ${ref(this.#dialog)} @click=${this.backdropCloseModal} part="dialog">
-        <button @click=${this.closeModal} class="close-button">${ByfoIcon('x')}</button><slot name="content"></slot>
+        <button @click=${this.closeModal} class="close-button">${ByfoIcon('x')}</button
+        ><slot name="content"></slot>
       </dialog>`;
   }
 
