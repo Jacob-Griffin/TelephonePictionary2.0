@@ -62,7 +62,7 @@ export class BYFOWritingInput extends LitElement {
   };
 
   get placeholderText() {
-    if (this.gameState?.round! > 0) {
+    if (this.gameState && this.gameState.round! > 0) {
       return 'Describe the image you were sent';
     } else {
       return 'Type in a word, phrase, or sentence to be passed along';

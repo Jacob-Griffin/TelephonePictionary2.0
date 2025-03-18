@@ -6,7 +6,7 @@ export type RouteResult = {
 };
 
 export interface RouteDefinition {
-  match: (p: string) => RouteResult | {};
+  match: (p: string) => RouteResult | undefined;
   render: (arg?: string) => TemplateResult;
   renderUrl: (arg?: string) => string;
   title?: string;
@@ -19,14 +19,12 @@ export function mapRoutes<T extends RouteList>(map: T): [keyof T, RouteDefinitio
   return Object.entries(map).map(([key, def]) => [key, def.render]);
 }
 
-export interface RedirectEventMap {
-  byforedirect: CustomEvent<RouteResult>;
-}
-
 export function emitRedirect(src: HTMLElement, detail: RouteResult) {
   src.dispatchEvent(new CustomEvent('byforedirect', { detail, bubbles: true }));
 }
 
 declare global {
-  interface HTMLElementEventMap extends RedirectEventMap {}
+  interface HTMLElementEventMap {
+    byforedirect: CustomEvent<RouteResult>;
+  }
 }

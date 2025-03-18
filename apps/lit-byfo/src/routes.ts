@@ -4,7 +4,7 @@ import { mapRoutes, type RouteList } from 'byfo-utils';
 export const routes: RouteList = {
   home: {
     match: p => {
-      return p === '/' ? { route: 'home' } : {};
+      return p === '/' ? { route: 'home' } : undefined;
     },
     render: () => {
       if (!window.customElements.get('byfo-app-home')) {
@@ -19,7 +19,7 @@ export const routes: RouteList = {
   game: {
     match: p => {
       const r = p.match(/^\/game\/(\d{1,7})\/?$/);
-      return !!r ? { route: 'game', arg: r[1] } : {};
+      return r ? { route: 'game', arg: r[1] } : undefined;
     },
     render: () => {
       if (!window.customElements.get('byfo-app-gameplay')) {
@@ -33,7 +33,7 @@ export const routes: RouteList = {
   lobby: {
     match: p => {
       const r = p.match(/^\/lobby\/(\d{1,7})\/?$/);
-      return !!r ? { route: 'lobby', arg: r[1] } : {};
+      return r ? { route: 'lobby', arg: r[1] } : undefined;
     },
     render: () => {
       if (!window.customElements.get('byfo-app-lobby')) {
@@ -47,7 +47,7 @@ export const routes: RouteList = {
   join: {
     match: p => {
       const r = p.match(/^\/join\/(\d{1,7})\/?$/);
-      return !!r ? { route: 'join', arg: r[1] } : {};
+      return r ? { route: 'join', arg: r[1] } : undefined;
     },
     render: () => {
       if (!window.customElements.get('byfo-app-join')) {
@@ -61,7 +61,7 @@ export const routes: RouteList = {
   review: {
     match: p => {
       const r = p.match(/^\/review\/(\d{1,7})\/?$/);
-      return !!r ? { route: 'review', arg: r[1] } : {};
+      return r ? { route: 'review', arg: r[1] } : undefined;
     },
     render: () => {
       if (!window.customElements.get('byfo-app-review')) {

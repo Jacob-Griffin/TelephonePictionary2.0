@@ -6,7 +6,7 @@ import { installRootStyles } from '@byfo/themes';
 import { BYFOStore } from 'byfo-utils/storage';
 import { ByfoIcon } from '@byfo/components/functional';
 import '@byfo/components/all';
-import { BYFOFirebaseAdapter, RedirectEventMap, RouteResult } from 'byfo-utils';
+import { BYFOFirebaseAdapter, RouteResult } from 'byfo-utils';
 import { provide } from '@lit/context';
 import { firebaseContext, storeContext, routeContext } from './context';
 
@@ -35,14 +35,14 @@ export class ByfoAppPage extends LitElement {
 
   #fetchRoute(fromWindow?: boolean) {
     const p = window.location.pathname;
-    let route: RouteResult | {} = {};
+    let route: RouteResult | undefined;
     for (const routeKey in routes) {
       route = routes[routeKey].match(p);
-      if ('route' in route) {
+      if (route && 'route' in route) {
         break;
       }
     }
-    if ('route' in route) {
+    if (route && 'route' in route) {
       this.#redirect(route.route, route.arg, fromWindow);
     } else {
       const [defaultRoute] = Object.entries(routes).find(([_, value]) => value.default) ?? ['home'];
@@ -141,7 +141,6 @@ declare global {
   interface HTMLElementTagNameMap {
     'byfo-app-page': ByfoAppPage;
   }
-  interface HTMLElementEventMap extends RedirectEventMap {}
 }
 
 declare const __FIREBASE_CONFIG__: ConstructorParameters<typeof BYFOFirebaseAdapter>[0];

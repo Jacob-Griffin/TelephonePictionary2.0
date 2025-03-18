@@ -33,7 +33,7 @@ export class ByfoVersionModal extends ByfoModal {
   isBeta = window.location.host.startsWith('beta.') || window.location.host.startsWith('localhost');
 
   switchBranch() {
-    const transferData = this.store.getString();
+    const transferData = this.store?.getString() ?? '';
     const oldHost = window.location.host;
     let newHost;
     if (oldHost.startsWith('localhost')) {
@@ -51,7 +51,10 @@ export class ByfoVersionModal extends ByfoModal {
   renderBody() {
     return html`<h2>We have a beta!</h2>
       ${this.isBeta ? html`<h5>(you are here)</h5>` : nothing}
-      <p>The beta version of the game has features that are mostly stable but just have a few more things to iron out. Here's what's different right now:</p>
+      <p>
+        The beta version of the game has features that are mostly stable but just have a few more things to
+        iron out. Here's what's different right now:
+      </p>
       <div class="changes a"><span>${unsafeHTML(formatMarkdown(this.changeContent))}</span></div>
       <button @click=${this.switchBranch}>${this.isBeta ? 'Return to stable' : 'Try beta'}</button>`;
   }

@@ -1,11 +1,9 @@
 import globals from 'globals';
 import pluginJs from '@eslint/js';
-import pluginVue from 'eslint-plugin-vue';
 import configPrettier from 'eslint-plugin-prettier/recommended';
-import vueEslintParser from 'vue-eslint-parser';
 import tseslint from 'typescript-eslint';
 
-const willFullyUpdate = ['**/byfo-components/**', '**/byfo-themes/**'];
+const willFullyUpdate = ['**/byfo-components/**', '**/byfo-themes/**', '**/tp-app/**'];
 
 /** @type {import('eslint').Linter.Config[]} */
 const config = [
@@ -14,13 +12,6 @@ const config = [
   { languageOptions: { globals: globals.browser } },
   pluginJs.configs.recommended,
   configPrettier,
-  ...pluginVue.configs['flat/essential'],
-  {
-    rules: {
-      'vue/multi-word-component-names': 'off',
-      'vue/no-deprecated-slot-attribute': 'off',
-    },
-  },
   ...tseslint.configs.recommended,
   {
     rules: {
@@ -41,19 +32,6 @@ const config = [
   {
     files: ['**/*.node.{js,mjs,cjs}'],
     languageOptions: { globals: globals.node },
-  },
-  {
-    files: ['**/*.vue'],
-    languageOptions: {
-      parser: vueEslintParser,
-      parserOptions: {
-        parser: tseslint.parser,
-        sourceType: 'module',
-        ecmaFeatures: {
-          jsx: true,
-        },
-      },
-    },
   },
 ];
 

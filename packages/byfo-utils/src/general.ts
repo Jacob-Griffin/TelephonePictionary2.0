@@ -1,7 +1,5 @@
-import type { BYFOStore } from './storage';
-import { BYFOConfig, config as defaultGameConfig } from './config';
-import { type BYFOFirebaseAdapter, Player, PlayerList } from './firebase';
-import { RouteResult } from './routing';
+import { config as defaultGameConfig } from './config';
+import { Player } from './firebase';
 
 export const stopPropagation = (e: Event) => e.stopPropagation();
 

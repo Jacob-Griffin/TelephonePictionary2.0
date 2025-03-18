@@ -107,19 +107,29 @@ export class ByfoSettingsModal extends ByfoModal {
           />
         </div>
         <div>
-          <h2 class="label">Always "Show all" <byfo-info-bubble content="Applies to review page"></byfo-info-bubble></h2>
-          <div id="showAll-toggle" class=${`toggle-wrapper${this.store?.alwaysShowAll ? ' checked' : ''}`} @click=${this.passClick}>
+          <h2 class="label">
+            Always "Show all" <byfo-info-bubble content="Applies to review page"></byfo-info-bubble>
+          </h2>
+          <div
+            id="showAll-toggle"
+            class=${`toggle-wrapper${this.store?.alwaysShowAll ? ' checked' : ''}`}
+            @click=${this.passClick}
+          >
             <input
               type="checkbox"
               id="showAllInput"
-              @input=${(e: TargetedInputEvent) => this.handleToggle('showAll', this.store?.setShowAll ?? (() => {}), e)}
+              @input=${(e: TargetedInputEvent) =>
+                this.handleToggle('showAll', this.store?.setShowAll ?? (() => {}), e)}
               checked=${this.store?.alwaysShowAll ? true : null}
             />
             <label htmlFor="showAllInput"></label>
           </div>
         </div>
       </section>
-      <h4>Looking for help? Check our <a href="https://github.com/Jacob-Griffin/TelephonePictionary2.0/wiki/Knowlege-Base">knowlege base</a></h4>
+      <h4>
+        Looking for help? Check our
+        <a href="https://github.com/Jacob-Griffin/TelephonePictionary2.0/wiki/Knowlege-Base">knowlege base</a>
+      </h4>
       ${this.buildDate?.full ? html` <p>Built on ${this.buildDate.full}</p> ` : null}
     `;
   }

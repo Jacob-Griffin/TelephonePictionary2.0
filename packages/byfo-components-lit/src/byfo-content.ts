@@ -16,7 +16,9 @@ export class ByfoContent extends LitElement {
   render() {
     return html` <article>
       ${this.type === 'image' ? html`<img src=${this.content} />` : html`<p>${this.content}</p>`}
-      ${this.sendingTo && this.type !== 'image' ? html`<p class="destination"><strong>Sending to:</strong> ${this.sendingTo}</p>` : null}
+      ${this.sendingTo && this.type !== 'image'
+        ? html`<p class="destination"><strong>Sending to:</strong> ${this.sendingTo}</p>`
+        : null}
     </article>`;
   }
   static styles = css`

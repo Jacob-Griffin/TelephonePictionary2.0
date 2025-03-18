@@ -32,7 +32,12 @@ console.log('Creating pr branch for new release');
 execSync(`git branch version-${version}`);
 execSync(`git switch version-${version}`);
 
-const packages = execSync('find packages/*/package.json apps/*/package.json ./package.json -iname package.json').toString().trim().split('\n');
+const packages = execSync(
+  'find packages/*/package.json apps/*/package.json ./package.json -iname package.json',
+)
+  .toString()
+  .trim()
+  .split('\n');
 
 packages.forEach(p => {
   const oldContent = execSync(`cat ${p}`).toString();
@@ -66,14 +71,18 @@ try {
 }
 execSync(`git push --set-upstream origin version-${version}`);
 
-const devpr = execSync(`gh pr create -t "Release ${version}" -b "Automated release PR for version ${version}" -B "dev" -H "version-${version}"`).toString();
+const devpr = execSync(
+  `gh pr create -t "Release ${version}" -b "Automated release PR for version ${version}" -B "dev" -H "version-${version}"`,
+).toString();
 const devid = devpr.match(/\/pull\/(\d+)/)[1];
 console.log(`Created PR #${devid} for version-${version} => dev`);
 
 execSync(`gh pr merge ${devid} --squash -d`);
 console.log(`Merged PR #${devid}. 'dev' is updated`);
 
-const releasepr = execSync(`gh pr create -t "Release ${version}" -b "Automated release PR for version ${version}" -B "release" -H "dev"`).toString();
+const releasepr = execSync(
+  `gh pr create -t "Release ${version}" -b "Automated release PR for version ${version}" -B "release" -H "dev"`,
+).toString();
 const releaseid = releasepr.match(/\/pull\/(\d+)/)[1];
 console.log(`Created PR #${releaseid} for version-${version} => release`);
 
@@ -97,7 +106,9 @@ const issues = [...issuesText.matchAll(/^\d+/gm)].map(match => match[0]);
 issues.forEach(id => {
   execSync(`gh issue edit ${id} --remove-label "C - Beta"`);
   execSync(`gh issue edit ${id} --add-label "C - Released"`);
-  execSync(`gh issue comment ${id} --body "Installed fixes from beta branch released with version ${version}"`);
+  execSync(
+    `gh issue comment ${id} --body "Installed fixes from beta branch released with version ${version}"`,
+  );
 });
 
 console.log(`Creating Release post`);
