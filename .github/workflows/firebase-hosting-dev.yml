@@ -14,7 +14,7 @@ jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Create ENV
         env:
           VITE_APIKEY: '${{ secrets.APIKEY }}'
@@ -43,7 +43,7 @@ jobs:
           echo "export const searchAPIKey = \"$VITE_SEARCHKEY\";" >> ./apps/tp-app/algolia.secrets.js
           echo "export const searchAppId = \"$VITE_SEARCHAPP\";" >> ./apps/tp-app/algolia.secrets.js
       - run: cat ./apps/tp-app/firebase.secrets.js
-      - uses: pnpm/action-setup@v4.0.0
+      - uses: pnpm/action-setup@v4
       - run: pnpm install && NODE_ENV=development pnpm build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
