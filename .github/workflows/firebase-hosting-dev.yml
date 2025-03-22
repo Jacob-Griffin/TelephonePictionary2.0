@@ -46,6 +46,7 @@ jobs:
           echo "export const searchAPIKey = \"$VITE_SEARCHKEY\";" >> ./apps/tp-app/algolia.secrets.js
           echo "export const searchAppId = \"$VITE_SEARCHAPP\";" >> ./apps/tp-app/algolia.secrets.js
       - run: cat ./apps/tp-app/firebase.secrets.js
+      - run: cp ./apps/tp-app/firebase.secrets.js ./apps/lit-byfo/firebase.config.js
       - uses: pnpm/action-setup@v4
       - run: pnpm install && NODE_ENV=development pnpm build
       - uses: FirebaseExtended/action-hosting-deploy@v0
