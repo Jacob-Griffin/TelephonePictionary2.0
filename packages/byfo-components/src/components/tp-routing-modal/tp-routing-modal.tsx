@@ -2,7 +2,7 @@ import { Component, h, Prop, Element, State, Watch } from '@stencil/core';
 import { renderModal } from '../../globals/modal';
 import { createModal, ModalContent } from './content';
 import { BYFOFirebaseAdapter } from 'byfo-utils';
-import { RejoinData } from 'byfo-utils/dist/types';
+import type { RejoinData } from 'byfo-utils';
 
 @Component({
   tag: 'tp-routing-modal',
@@ -44,7 +44,8 @@ export class TpRoutingModal {
     }
     this.contentModel = createModal(newValue, this.rerender, this.firebase);
     if (this.rejoin && newValue === 'join') {
-      this.contentModel.fieldValues = this.rejoin;
+      const { gameid, name } = this.rejoin;
+      this.contentModel.fieldValues = { gameid, name };
       this.contentModel.actionError = 'Populated from incomplete game';
       this.pendingRejoin = true;
     }

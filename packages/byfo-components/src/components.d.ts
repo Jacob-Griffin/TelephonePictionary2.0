@@ -6,9 +6,7 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { BYFOFirebaseAdapter, Metadata, Player, RejoinData, RoundData, TPStore } from "byfo-utils";
-import { RejoinData as RejoinData1 } from "byfo-utils/dist/types";
 export { BYFOFirebaseAdapter, Metadata, Player, RejoinData, RoundData, TPStore } from "byfo-utils";
-export { RejoinData as RejoinData1 } from "byfo-utils/dist/types";
 export namespace Components {
     interface TpCanvas {
         "exportDrawing": () => Promise<Blob>;
@@ -66,7 +64,7 @@ export namespace Components {
     interface TpRoutingModal {
         "enabled": boolean;
         "firebase": BYFOFirebaseAdapter;
-        "rejoin"?: RejoinData1 | null;
+        "rejoin"?: RejoinData | null;
         "type": 'host' | 'join' | 'result' | undefined;
     }
     interface TpSettingsModal {
@@ -263,7 +261,7 @@ declare namespace LocalJSX {
     interface TpRoutingModal {
         "enabled"?: boolean;
         "firebase"?: BYFOFirebaseAdapter;
-        "rejoin"?: RejoinData1 | null;
+        "rejoin"?: RejoinData | null;
         "type"?: 'host' | 'join' | 'result' | undefined;
     }
     interface TpSettingsModal {
