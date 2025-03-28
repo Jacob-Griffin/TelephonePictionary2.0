@@ -12,7 +12,8 @@ export const html: typeof litHtml = (template, ...values) => {
 export const preload = (...tagnames: string[]): void => {
   for (const tag of tagnames) {
     if (tag?.startsWith('byfo-') && !window.customElements.get(tag)) {
-      import(`../components/${tag}.ts`);
+      const extension = import.meta.url.includes('/dist') ? '.js' : '.ts';
+      import(`../components/${tag}${extension}`);
     }
   }
 };

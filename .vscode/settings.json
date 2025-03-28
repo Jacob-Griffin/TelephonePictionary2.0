@@ -1,4 +1,7 @@
 {
   "editor.formatOnSave": true,
-  "prettier.prettierPath": "./node_modules/prettier"
+  "editor.formatOnPaste": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "prettier.prettierPath": "./node_modules/prettier",
+  "editor.tabSize": 2
 }

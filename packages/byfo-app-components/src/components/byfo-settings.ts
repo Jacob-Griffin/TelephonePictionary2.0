@@ -8,6 +8,8 @@ import buttonStyles from '../styles/button.style';
 import { applicationRules, CustomTheme, ThemeId, themes } from '@byfo/themes';
 import { BYFOStore } from 'byfo-utils';
 import { createRef, ref, Ref } from 'lit/directives/ref.js';
+import { ByfoIcon } from './functional/Icon';
+import { ByfoToggle, toggleStyles } from './functional/Toggle';
 
 @customElement('byfo-settings')
 export default class BYFOSettings extends LitElement {
@@ -110,6 +112,14 @@ export default class BYFOSettings extends LitElement {
           .value=${this.store?.customStyle.backgroundBlur}
           @input=${this.handleStyle}
         />
+        <h3>
+          Always "Show all"
+          <byfo-tooltip
+            message="This makes it so that all cards in a stack are visible right away at the end of a game"
+            >${ByfoIcon('info')}</byfo-tooltip
+          >
+        </h3>
+        ${ByfoToggle(this.store?.setShowAll ?? (() => {}), !!this.store?.alwaysShowAll)}
       </section>`;
   }
 
@@ -152,7 +162,7 @@ export default class BYFOSettings extends LitElement {
         }
 
         button {
-          place-self: center end;
+          place-self: center;
         }
 
         h3,
@@ -160,15 +170,21 @@ export default class BYFOSettings extends LitElement {
           font-size: 1.3rem;
           place-self: center start;
           margin: 0;
+          vertical-align: middle;
         }
 
         h4 {
           font-size: 1.15rem;
           padding-inline-start: 3ch;
         }
+        byfo-toggle {
+          --unit: 1.15rem;
+          place-self: center end;
+        }
       }
     `,
     buttonStyles,
+    toggleStyles,
     applicationRules,
   ];
 }
