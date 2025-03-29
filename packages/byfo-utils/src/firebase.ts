@@ -244,7 +244,7 @@ export class BYFOFirebaseAdapter {
     // Check to make sure there isn't a rejoin or duplicate name
     for (const playerNumber in players) {
       const player = players[playerNumber];
-      if (player.username === username) {
+      if (player.username.toLowerCase() === username.toLowerCase()) {
         if (player.status === 'missing') {
           return {
             action: 'join',
