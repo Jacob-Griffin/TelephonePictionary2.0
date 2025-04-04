@@ -62,7 +62,6 @@ export class BYFOCanvas extends LitElement {
     const backupdata = this.backup.get() ?? undefined;
     this.state = new BYFOCanvasState(this.canvas, { internalHeight, internalWidth }, backupdata);
     this.state.on('backup', data => {
-      console.log(data);
       this.backup.set(data);
       if (this.state!.paths.length <= 2) {
         this.requestUpdate();
