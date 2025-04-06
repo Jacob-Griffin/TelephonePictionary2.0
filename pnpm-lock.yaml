@@ -44,12 +44,12 @@ importers:
       '@byfo/themes':
         specifier: workspace:^
         version: link:../../packages/byfo-app-themes
+      '@byfo/utils':
+        specifier: workspace:^
+        version: link:../../packages/byfo-app-utils
       '@lit/context':
         specifier: ^1.1.4
         version: 1.1.4
-      byfo-utils:
-        specifier: workspace:^
-        version: link:../../packages/byfo-utils
       lit:
         specifier: ^3.2.1
         version: 3.2.1
@@ -118,9 +118,9 @@ importers:
       '@byfo/themes':
         specifier: workspace:^
         version: link:../byfo-app-themes
-      byfo-utils:
+      '@byfo/utils':
         specifier: workspace:*
-        version: link:../byfo-utils
+        version: link:../byfo-app-utils
       lit:
         specifier: ^3.2.1
         version: 3.2.1
@@ -137,6 +137,28 @@ importers:
       typescript:
         specifier: 5.7.3
         version: 5.7.3
+
+  packages/byfo-app-utils:
+    dependencies:
+      '@byfo/themes':
+        specifier: workspace:^
+        version: link:../byfo-app-themes
+      firebase:
+        specifier: 11.2.0
+        version: 11.2.0
+    devDependencies:
+      lit:
+        specifier: ^3.2.1
+        version: 3.2.1
+      typescript:
+        specifier: 5.7.3
+        version: 5.7.3
+      vite:
+        specifier: 6.2.5
+        version: 6.2.5(@types/node@22.13.4)
+      vitest:
+        specifier: ^3.0.4
+        version: 3.0.4(@types/node@22.13.4)
 
   packages/byfo-components:
     dependencies:
@@ -306,6 +328,7 @@ packages:
 
   '@effect/schema@0.75.5':
     resolution: {integrity: sha512-TQInulTVCuF+9EIbJpyLP6dvxbQJMphrnRqgexm/Ze39rSjfhJuufF7XvU3SxTgg3HnL7B/kpORTJbHhlE6thw==}
+    deprecated: this package has been merged into the main effect package
     peerDependencies:
       effect: ^3.9.2
 
@@ -899,11 +922,6 @@ packages:
   '@grpc/grpc-js@1.9.15':
     resolution: {integrity: sha512-nqE7Hc0AzI+euzUwDAy0aY5hCp10r734gMGRdU+qOPX0XSceI2ULrcXB5U2xSc5VkWwalCj4M7GzCAygZl2KoQ==}
     engines: {node: ^8.13.0 || >=10.10.0}
-
-  '@grpc/proto-loader@0.7.10':
-    resolution: {integrity: sha512-CAqDfoaQ8ykFd9zqBDn4k6iWT9loLAlc2ETmDFS9JCD70gDcnA4L3AFEo2iV7KyAtAAHFW9ftq1Fz+Vsgq80RQ==}
-    engines: {node: '>=6'}
-    hasBin: true
 
   '@grpc/proto-loader@0.7.13':
     resolution: {integrity: sha512-AiXO/bfe9bmxBjxxtYxFAXGZvMaN5s8kO+jBHAJCON8rJoB5YS/D6X7ZNc6XQkuHNmyl4CYaMI1fJ/Gn27RGGw==}
@@ -2196,9 +2214,6 @@ packages:
   magic-string@0.25.9:
     resolution: {integrity: sha512-RmF0AsMzgt25qzqqLc1+MbHmhdx0ojF2Fvs4XnOqz2ZOBXzzkEwc/dJQZCYHAn7v1jbVOjAZfK8msRn4BxO4VQ==}
 
-  magic-string@0.30.11:
-    resolution: {integrity: sha512-+Wri9p0QHMy+545hKww7YAu5NyzF8iomPL/RQazugQ9+Ez4Ic3mERMd8ZTX5rfK944j+560ZJi8iAwgak1Ac7A==}
-
   magic-string@0.30.17:
     resolution: {integrity: sha512-sNPKHvyjVf7gyjwS4xGTaW/mCnF8wnjtifKBEhxfZ7E/S8tQ0rssrwGNn6q8JH/ohItJfSQp9mBtQYuTlH5QnA==}
 
@@ -2903,6 +2918,46 @@ packages:
       yaml:
         optional: true
 
+  vite@6.2.5:
+    resolution: {integrity: sha512-j023J/hCAa4pRIUH6J9HemwYfjB5llR2Ps0CWeikOtdR8+pAURAk0DoJC5/mm9kd+UgdnIy7d6HE4EAvlYhPhA==}
+    engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
+    hasBin: true
+    peerDependencies:
+      '@types/node': ^18.0.0 || ^20.0.0 || >=22.0.0
+      jiti: '>=1.21.0'
+      less: '*'
+      lightningcss: ^1.21.0
+      sass: '*'
+      sass-embedded: '*'
+      stylus: '*'
+      sugarss: '*'
+      terser: ^5.16.0
+      tsx: ^4.8.1
+      yaml: ^2.4.2
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+      jiti:
+        optional: true
+      less:
+        optional: true
+      lightningcss:
+        optional: true
+      sass:
+        optional: true
+      sass-embedded:
+        optional: true
+      stylus:
+        optional: true
+      sugarss:
+        optional: true
+      terser:
+        optional: true
+      tsx:
+        optional: true
+      yaml:
+        optional: true
+
   vitest@3.0.4:
     resolution: {integrity: sha512-6XG8oTKy2gnJIFTHP6LD7ExFeNLxiTkK3CfMvT7IfR8IN+BYICCf0lXUQmX7i7JoxUP8QmeP4mTnWXgflu4yjw==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
@@ -3321,7 +3376,7 @@ snapshots:
       '@firebase/app-compat': 0.2.48
       '@firebase/component': 0.6.12
       '@firebase/util': 1.10.3
-      tslib: 2.6.2
+      tslib: 2.8.1
     transitivePeerDependencies:
       - '@firebase/app'
 
@@ -3334,7 +3389,7 @@ snapshots:
       '@firebase/installations': 0.6.12(@firebase/app@0.10.18)
       '@firebase/logger': 0.4.4
       '@firebase/util': 1.10.3
-      tslib: 2.6.2
+      tslib: 2.8.1
 
   '@firebase/app-check-compat@0.3.18(@firebase/app-compat@0.2.48)(@firebase/app@0.10.18)':
     dependencies:
@@ -3344,7 +3399,7 @@ snapshots:
       '@firebase/component': 0.6.12
       '@firebase/logger': 0.4.4
       '@firebase/util': 1.10.3
-      tslib: 2.6.2
+      tslib: 2.8.1
     transitivePeerDependencies:
       - '@firebase/app'
 
@@ -3358,7 +3413,7 @@ snapshots:
       '@firebase/component': 0.6.12
       '@firebase/logger': 0.4.4
       '@firebase/util': 1.10.3
-      tslib: 2.6.2
+      tslib: 2.8.1
 
   '@firebase/app-compat@0.2.48':
     dependencies:
@@ -3366,7 +3421,7 @@ snapshots:
       '@firebase/component': 0.6.12
       '@firebase/logger': 0.4.4
       '@firebase/util': 1.10.3
-      tslib: 2.6.2
+      tslib: 2.8.1
 
   '@firebase/app-types@0.9.3': {}
 
@@ -3376,7 +3431,7 @@ snapshots:
       '@firebase/logger': 0.4.4
       '@firebase/util': 1.10.3
       idb: 7.1.1
-      tslib: 2.6.2
+      tslib: 2.8.1
 
   '@firebase/auth-compat@0.5.17(@firebase/app-compat@0.2.48)(@firebase/app-types@0.9.3)(@firebase/app@0.10.18)':
     dependencies:
@@ -3385,7 +3440,7 @@ snapshots:
       '@firebase/auth-types': 0.12.3(@firebase/app-types@0.9.3)(@firebase/util@1.10.3)
       '@firebase/component': 0.6.12
       '@firebase/util': 1.10.3
-      tslib: 2.6.2
+      tslib: 2.8.1
     transitivePeerDependencies:
       - '@firebase/app'
       - '@firebase/app-types'
@@ -3404,12 +3459,12 @@ snapshots:
       '@firebase/component': 0.6.12
       '@firebase/logger': 0.4.4
       '@firebase/util': 1.10.3
-      tslib: 2.6.2
+      tslib: 2.8.1
 
   '@firebase/component@0.6.12':
     dependencies:
       '@firebase/util': 1.10.3
-      tslib: 2.6.2
+      tslib: 2.8.1
 
   '@firebase/data-connect@0.2.0(@firebase/app@0.10.18)':
     dependencies:
@@ -3418,7 +3473,7 @@ snapshots:
       '@firebase/component': 0.6.12
       '@firebase/logger': 0.4.4
       '@firebase/util': 1.10.3
-      tslib: 2.6.2
+      tslib: 2.8.1
 
   '@firebase/database-compat@2.0.2':
     dependencies:
@@ -3427,7 +3482,7 @@ snapshots:
       '@firebase/database-types': 1.0.8
       '@firebase/logger': 0.4.4
       '@firebase/util': 1.10.3
-      tslib: 2.6.2
+      tslib: 2.8.1
 
   '@firebase/database-compat@2.0.3':
     dependencies:
@@ -3451,7 +3506,7 @@ snapshots:
       '@firebase/logger': 0.4.4
       '@firebase/util': 1.10.3
       faye-websocket: 0.11.4
-      tslib: 2.6.2
+      tslib: 2.8.1
 
   '@firebase/database@1.0.12':
     dependencies:
@@ -3470,7 +3525,7 @@ snapshots:
       '@firebase/firestore': 4.7.6(@firebase/app@0.10.18)
       '@firebase/firestore-types': 3.0.3(@firebase/app-types@0.9.3)(@firebase/util@1.10.3)
       '@firebase/util': 1.10.3
-      tslib: 2.6.2
+      tslib: 2.8.1
     transitivePeerDependencies:
       - '@firebase/app'
       - '@firebase/app-types'
@@ -3488,8 +3543,8 @@ snapshots:
       '@firebase/util': 1.10.3
       '@firebase/webchannel-wrapper': 1.0.3
       '@grpc/grpc-js': 1.9.15
-      '@grpc/proto-loader': 0.7.10
-      tslib: 2.6.2
+      '@grpc/proto-loader': 0.7.13
+      tslib: 2.8.1
 
   '@firebase/functions-compat@0.3.18(@firebase/app-compat@0.2.48)(@firebase/app@0.10.18)':
     dependencies:
@@ -3498,7 +3553,7 @@ snapshots:
       '@firebase/functions': 0.12.1(@firebase/app@0.10.18)
       '@firebase/functions-types': 0.6.3
       '@firebase/util': 1.10.3
-      tslib: 2.6.2
+      tslib: 2.8.1
     transitivePeerDependencies:
       - '@firebase/app'
 
@@ -3512,7 +3567,7 @@ snapshots:
       '@firebase/component': 0.6.12
       '@firebase/messaging-interop-types': 0.2.3
       '@firebase/util': 1.10.3
-      tslib: 2.6.2
+      tslib: 2.8.1
 
   '@firebase/installations-compat@0.2.12(@firebase/app-compat@0.2.48)(@firebase/app-types@0.9.3)(@firebase/app@0.10.18)':
     dependencies:
@@ -3521,7 +3576,7 @@ snapshots:
       '@firebase/installations': 0.6.12(@firebase/app@0.10.18)
       '@firebase/installations-types': 0.5.3(@firebase/app-types@0.9.3)
       '@firebase/util': 1.10.3
-      tslib: 2.6.2
+      tslib: 2.8.1
     transitivePeerDependencies:
       - '@firebase/app'
       - '@firebase/app-types'
@@ -3536,11 +3591,11 @@ snapshots:
       '@firebase/component': 0.6.12
       '@firebase/util': 1.10.3
       idb: 7.1.1
-      tslib: 2.6.2
+      tslib: 2.8.1
 
   '@firebase/logger@0.4.4':
     dependencies:
-      tslib: 2.6.2
+      tslib: 2.8.1
 
   '@firebase/messaging-compat@0.2.16(@firebase/app-compat@0.2.48)(@firebase/app@0.10.18)':
     dependencies:
@@ -3548,7 +3603,7 @@ snapshots:
       '@firebase/component': 0.6.12
       '@firebase/messaging': 0.12.16(@firebase/app@0.10.18)
       '@firebase/util': 1.10.3
-      tslib: 2.6.2
+      tslib: 2.8.1
     transitivePeerDependencies:
       - '@firebase/app'
 
@@ -3562,7 +3617,7 @@ snapshots:
       '@firebase/messaging-interop-types': 0.2.3
       '@firebase/util': 1.10.3
       idb: 7.1.1
-      tslib: 2.6.2
+      tslib: 2.8.1
 
   '@firebase/performance-compat@0.2.12(@firebase/app-compat@0.2.48)(@firebase/app@0.10.18)':
     dependencies:
@@ -3572,7 +3627,7 @@ snapshots:
       '@firebase/performance': 0.6.12(@firebase/app@0.10.18)
       '@firebase/performance-types': 0.2.3
       '@firebase/util': 1.10.3
-      tslib: 2.6.2
+      tslib: 2.8.1
     transitivePeerDependencies:
       - '@firebase/app'
 
@@ -3585,7 +3640,7 @@ snapshots:
       '@firebase/installations': 0.6.12(@firebase/app@0.10.18)
       '@firebase/logger': 0.4.4
       '@firebase/util': 1.10.3
-      tslib: 2.6.2
+      tslib: 2.8.1
 
   '@firebase/remote-config-compat@0.2.12(@firebase/app-compat@0.2.48)(@firebase/app@0.10.18)':
     dependencies:
@@ -3595,7 +3650,7 @@ snapshots:
       '@firebase/remote-config': 0.5.0(@firebase/app@0.10.18)
       '@firebase/remote-config-types': 0.4.0
       '@firebase/util': 1.10.3
-      tslib: 2.6.2
+      tslib: 2.8.1
     transitivePeerDependencies:
       - '@firebase/app'
 
@@ -3608,7 +3663,7 @@ snapshots:
       '@firebase/installations': 0.6.12(@firebase/app@0.10.18)
       '@firebase/logger': 0.4.4
       '@firebase/util': 1.10.3
-      tslib: 2.6.2
+      tslib: 2.8.1
 
   '@firebase/storage-compat@0.3.15(@firebase/app-compat@0.2.48)(@firebase/app-types@0.9.3)(@firebase/app@0.10.18)':
     dependencies:
@@ -3617,7 +3672,7 @@ snapshots:
       '@firebase/storage': 0.13.5(@firebase/app@0.10.18)
       '@firebase/storage-types': 0.8.3(@firebase/app-types@0.9.3)(@firebase/util@1.10.3)
       '@firebase/util': 1.10.3
-      tslib: 2.6.2
+      tslib: 2.8.1
     transitivePeerDependencies:
       - '@firebase/app'
       - '@firebase/app-types'
@@ -3632,11 +3687,11 @@ snapshots:
       '@firebase/app': 0.10.18
       '@firebase/component': 0.6.12
       '@firebase/util': 1.10.3
-      tslib: 2.6.2
+      tslib: 2.8.1
 
   '@firebase/util@1.10.3':
     dependencies:
-      tslib: 2.6.2
+      tslib: 2.8.1
 
   '@firebase/vertexai@1.0.3(@firebase/app-types@0.9.3)(@firebase/app@0.10.18)':
     dependencies:
@@ -3646,7 +3701,7 @@ snapshots:
       '@firebase/component': 0.6.12
       '@firebase/logger': 0.4.4
       '@firebase/util': 1.10.3
-      tslib: 2.6.2
+      tslib: 2.8.1
 
   '@firebase/webchannel-wrapper@1.0.3': {}
 
@@ -3704,15 +3759,8 @@ snapshots:
 
   '@grpc/grpc-js@1.9.15':
     dependencies:
-      '@grpc/proto-loader': 0.7.10
+      '@grpc/proto-loader': 0.7.13
       '@types/node': 22.13.4
-
-  '@grpc/proto-loader@0.7.10':
-    dependencies:
-      lodash.camelcase: 4.3.0
-      long: 5.2.3
-      protobufjs: 7.2.6
-      yargs: 17.7.2
 
   '@grpc/proto-loader@0.7.13':
     dependencies:
@@ -3720,7 +3768,6 @@ snapshots:
       long: 5.3.1
       protobufjs: 7.4.0
       yargs: 17.7.2
-    optional: true
 
   '@humanfs/core@0.19.1': {}
 
@@ -4062,13 +4109,13 @@ snapshots:
       chai: 5.1.2
       tinyrainbow: 2.0.0
 
-  '@vitest/mocker@3.0.4(vite@6.2.1(@types/node@22.13.4))':
+  '@vitest/mocker@3.0.4(vite@6.2.5(@types/node@22.13.4))':
     dependencies:
       '@vitest/spy': 3.0.4
       estree-walker: 3.0.3
       magic-string: 0.30.17
     optionalDependencies:
-      vite: 6.2.1(@types/node@22.13.4)
+      vite: 6.2.5(@types/node@22.13.4)
 
   '@vitest/pretty-format@3.0.4':
     dependencies:
@@ -4116,7 +4163,7 @@ snapshots:
       '@vue/compiler-ssr': 3.4.38
       '@vue/shared': 3.4.38
       estree-walker: 2.0.2
-      magic-string: 0.30.11
+      magic-string: 0.30.17
       postcss: 8.4.41
       source-map-js: 1.2.0
 
@@ -5199,8 +5246,7 @@ snapshots:
 
   long@5.2.3: {}
 
-  long@5.3.1:
-    optional: true
+  long@5.3.1: {}
 
   loupe@3.1.3: {}
 
@@ -5218,10 +5264,6 @@ snapshots:
   magic-string@0.25.9:
     dependencies:
       sourcemap-codec: 1.4.8
-
-  magic-string@0.30.11:
-    dependencies:
-      '@jridgewell/sourcemap-codec': 1.5.0
 
   magic-string@0.30.17:
     dependencies:
@@ -5449,7 +5491,6 @@ snapshots:
       '@protobufjs/utf8': 1.1.0
       '@types/node': 22.13.4
       long: 5.3.1
-    optional: true
 
   proxy-addr@2.0.7:
     dependencies:
@@ -5845,7 +5886,7 @@ snapshots:
       debug: 4.4.0
       es-module-lexer: 1.6.0
       pathe: 2.0.2
-      vite: 6.2.1(@types/node@22.13.4)
+      vite: 6.2.5(@types/node@22.13.4)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -5878,10 +5919,19 @@ snapshots:
       '@types/node': 22.13.4
       fsevents: 2.3.3
 
+  vite@6.2.5(@types/node@22.13.4):
+    dependencies:
+      esbuild: 0.25.1
+      postcss: 8.5.3
+      rollup: 4.34.0
+    optionalDependencies:
+      '@types/node': 22.13.4
+      fsevents: 2.3.3
+
   vitest@3.0.4(@types/node@22.13.4):
     dependencies:
       '@vitest/expect': 3.0.4
-      '@vitest/mocker': 3.0.4(vite@6.2.1(@types/node@22.13.4))
+      '@vitest/mocker': 3.0.4(vite@6.2.5(@types/node@22.13.4))
       '@vitest/pretty-format': 3.0.4
       '@vitest/runner': 3.0.4
       '@vitest/snapshot': 3.0.4
@@ -5897,7 +5947,7 @@ snapshots:
       tinyexec: 0.3.2
       tinypool: 1.0.2
       tinyrainbow: 2.0.0
-      vite: 6.2.1(@types/node@22.13.4)
+      vite: 6.2.5(@types/node@22.13.4)
       vite-node: 3.0.4(@types/node@22.13.4)
       why-is-node-running: 2.3.0
     optionalDependencies:

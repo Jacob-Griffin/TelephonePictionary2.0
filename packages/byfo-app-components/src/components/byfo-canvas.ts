@@ -3,7 +3,7 @@ import { property, state } from 'lit/decorators.js';
 import { customElement } from '../utils/byfoCustomElement';
 import { createRef, ref, Ref } from 'lit/directives/ref.js';
 import { html } from '../utils/byfoHtml';
-import { BYFOCanvasState, BYFOGameState } from 'byfo-utils';
+import { BYFOCanvasState, BYFOGameState } from '@byfo/utils';
 import { map } from 'lit/directives/map.js';
 
 import { ByfoIcon } from './functional/Icon';
@@ -53,9 +53,10 @@ export class BYFOCanvas extends LitElement {
   };
 
   get canSubmit() {
-    return (
-      !this.submitting && (this.state?.paths.length ?? 0) > 1 && this.state?.paths.at(-1)?.clear === undefined
-    );
+    if (!this.state) {
+      return false;
+    }
+    return !this.submitting && (this.state.paths.length ?? 0) > 1 && !('clear' in this.state.paths.at(-1)!);
   }
 
   protected firstUpdated(_changedProperties: PropertyValues): void {

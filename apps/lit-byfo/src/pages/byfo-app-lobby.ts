@@ -8,7 +8,7 @@ import {
   GameStatus,
   PlayerList,
   RouteResult,
-} from 'byfo-utils';
+} from '@byfo/utils';
 import { buttonStyle, inputStyle } from '@byfo/components/styles';
 import { firebaseContext, routeContext, storeContext } from '../context';
 import { consume } from '@lit/context';
@@ -132,7 +132,7 @@ export class ByfoAppLobby extends LitElement {
   @consume({ context: routeContext })
   route!: RouteResult;
   @consume({ context: storeContext })
-  store!: BYFOStore;
+  store!: BYFOStore<ThemeId[]>;
   @consume({ context: firebaseContext })
   firebase!: BYFOFirebaseAdapter;
 

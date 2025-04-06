@@ -5,7 +5,7 @@ import { ByfoIcon } from './src/components/functional/Icon';
 import { ByfoMarkdown } from './src/components/functional/Markdown';
 import { ByfoCard, cardStyles } from './src/components/functional/Card';
 import { installRootStyles } from '@byfo/themes';
-import { BYFOStore } from 'byfo-utils/storage';
+import { BYFOStore } from '@byfo/utils/storage';
 
 const store = new BYFOStore();
 @customElement('byfo-testpage')

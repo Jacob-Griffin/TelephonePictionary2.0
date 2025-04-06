@@ -1,5 +1,5 @@
 import { html } from 'lit';
-import { mapRoutes, type RouteList } from 'byfo-utils';
+import { mapRoutes, type RouteList } from '@byfo/utils';
 
 export const routes: RouteList = {
   home: {

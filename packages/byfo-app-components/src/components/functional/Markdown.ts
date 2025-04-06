@@ -1,5 +1,5 @@
 import { html, TemplateResult } from 'lit';
-import { parseByToken, Token, TokenType } from 'byfo-utils';
+import { parseByToken, Token, TokenType } from '@byfo/utils';
 import { map } from 'lit/directives/map.js';
 
 export function ByfoMarkdown(contentIn: string, withAdvanced?: boolean) {

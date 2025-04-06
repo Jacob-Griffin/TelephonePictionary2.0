@@ -19,7 +19,18 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    "paths": {
+      "@byfo/utils": ["../../packages/byfo-app-utils/src/index.ts"],
+      "@byfo/utils/*": ["../../packages/byfo-app-utils/src/*.ts"],
+      "@byfo/components": ["../../packages/byfo-app-components/src/index.ts"],
+      "@byfo/components/all": ["../../packages/byfo-app-components/src/components/index.ts"],
+      "@byfo/components/functional": [
+        "../../packages/byfo-app-components/src/components/functional/index.ts"
+      ],
+      "@byfo/components/styles": ["../../packages/byfo-app-components/src/styles/index.ts"]
+    }
   },
   "include": ["src"]
 }

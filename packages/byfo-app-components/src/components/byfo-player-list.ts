@@ -1,7 +1,7 @@
 import { css, LitElement, nothing, PropertyValues, TemplateResult } from 'lit';
 import { customElement } from '../utils/byfoCustomElement';
 import { html } from '../utils/byfoHtml';
-import { BYFOConfig, decodePath, sortNames, sortNamesBy, type PlayerList } from 'byfo-utils';
+import { BYFOConfig, decodePath, sortNames, sortNameMap, type PlayerList } from '@byfo/utils';
 import { property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import backdropStyle from '../styles/backdrop.style';
@@ -29,7 +29,7 @@ export default class BYFOPlayerList extends LitElement {
       } else if (this.statusMap) {
         const newlist = [];
         // TODO Sorting
-        const sorted = sortNamesBy(Object.entries(this.statusMap), 0);
+        const sorted = sortNameMap(this.statusMap);
         for (const [name, ready] of sorted) {
           newlist.push(html`<p class=${ready ? 'ready' : 'waiting'}>${ready ? '✓' : '•'}</p>`);
           newlist.push(html`<p>${decodePath(name)}</p>`);

@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@byfo/themes": "workspace:^",
-    "byfo-utils": "workspace:*",
+    "@byfo/utils": "workspace:*",
     "lit": "^3.2.1"
   },
   "devDependencies": {

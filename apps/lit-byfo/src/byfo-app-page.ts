@@ -2,11 +2,10 @@ import { LitElement, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { routes, routeMap } from './routes';
 import { choose } from 'lit/directives/choose.js';
-import { installRootStyles } from '@byfo/themes';
-import { BYFOStore } from 'byfo-utils/storage';
+import { installRootStyles, themes } from '@byfo/themes';
 import { ByfoIcon } from '@byfo/components/functional';
 import '@byfo/components/all';
-import { BYFOFirebaseAdapter, RouteResult } from 'byfo-utils';
+import { BYFOFirebaseAdapter, RouteResult, BYFOStore } from '@byfo/utils';
 import { provide } from '@lit/context';
 import { firebaseContext, storeContext, routeContext } from './context';
 
@@ -55,8 +54,8 @@ export class ByfoAppPage extends LitElement {
     this.#redirect(detail.route, detail.arg);
   };
 
-  @provide({ context: storeContext }) store = new BYFOStore();
-  @provide({ context: firebaseContext }) firebase = new BYFOFirebaseAdapter(__FIREBASE_CONFIG__, {}, true);
+  @provide({ context: storeContext }) store = new BYFOStore<ThemeId[]>(themes, 'classic');
+  @provide({ context: firebaseContext }) firebase = new BYFOFirebaseAdapter(__FIREBASE_CONFIG__, {});
 
   @provide({ context: routeContext })
   @state()

@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { buttonStyle } from '@byfo/components/styles';
 import { consume } from '@lit/context';
 import { firebaseContext, routeContext, storeContext } from '../context';
-import { BYFOFirebaseAdapter, BYFOStore, RouteResult } from 'byfo-utils';
+import { BYFOFirebaseAdapter, BYFOStore, RouteResult } from '@byfo/utils';
 
 @customElement('byfo-app-review')
 export class ByfoAppReview extends LitElement {
@@ -20,7 +20,7 @@ export class ByfoAppReview extends LitElement {
   @consume({ context: firebaseContext })
   firebase!: BYFOFirebaseAdapter;
   @consume({ context: storeContext })
-  store!: BYFOStore;
+  store!: BYFOStore<ThemeId[]>;
   @consume({ context: routeContext })
   route!: RouteResult;
 

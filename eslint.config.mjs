@@ -8,7 +8,7 @@ const willFullyUpdate = ['**/byfo-components/**', '**/byfo-themes/**', '**/tp-ap
 /** @type {import('eslint').Linter.Config[]} */
 const config = [
   { ignores: ['**/dist/**/*', '**/node_modules/**/*', '**/functions/**/*', ...willFullyUpdate] },
-  { files: ['**/*.{js,mjs,cjs}'] },
+  { files: ['**/*.{js,mjs,cjs,ts}'] },
   { languageOptions: { globals: globals.browser } },
   pluginJs.configs.recommended,
   configPrettier,

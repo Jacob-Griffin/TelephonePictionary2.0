@@ -9,7 +9,7 @@ import {
   type BYFOFirebaseAdapter,
   type BYFOStore,
   emitRedirect,
-} from 'byfo-utils';
+} from '@byfo/utils';
 import { consume } from '@lit/context';
 
 @customElement('byfo-app-join')
@@ -22,7 +22,7 @@ export class ByfoAppJoin extends LitElement {
   @consume({ context: firebaseContext })
   firebase!: BYFOFirebaseAdapter;
   @consume({ context: storeContext })
-  store!: BYFOStore;
+  store!: BYFOStore<ThemeId[]>;
   @consume({ context: routeContext })
   route!: RouteResult;
 
@@ -35,7 +35,7 @@ export class ByfoAppJoin extends LitElement {
     },
   ];
   join = async (values: Record<string, string>) => {
-    const response = await this.firebase.addPlayerToLobby(~~this.route.arg!, values.username);
+    const response = await this.firebase.joinGame(~~this.route.arg!, values.username);
     if (response.action === 'error') {
       throw new Error(response.detail);
     }

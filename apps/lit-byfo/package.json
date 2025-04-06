@@ -13,7 +13,7 @@
     "@byfo/components": "workspace:^",
     "@byfo/themes": "workspace:^",
     "@lit/context": "^1.1.4",
-    "byfo-utils": "workspace:^",
+    "@byfo/utils": "workspace:^",
     "lit": "^3.2.1"
   },
   "devDependencies": {

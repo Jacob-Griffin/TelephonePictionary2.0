@@ -7,7 +7,7 @@ import {
   isValidUsername,
   type BYFOFirebaseAdapter,
   type BYFOStore,
-} from 'byfo-utils';
+} from '@byfo/utils';
 import { firebaseContext, storeContext } from '../context';
 import { consume } from '@lit/context';
 
@@ -23,12 +23,12 @@ export class ByfoAppHome extends LitElement {
   @consume({ context: firebaseContext })
   firebase!: BYFOFirebaseAdapter;
   @consume({ context: storeContext })
-  store!: BYFOStore;
+  store!: BYFOStore<ThemeId[]>;
 
   forms: Record<string, Form> = {
     join: {
       action: async values => {
-        const response = await this.firebase.addPlayerToLobby(~~values.gameid, values.username);
+        const response = await this.firebase.joinGame(~~values.gameid, values.username);
         if (response.action === 'error') {
           throw new Error(response.detail);
         }

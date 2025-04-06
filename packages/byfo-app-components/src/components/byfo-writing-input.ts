@@ -2,7 +2,7 @@ import { LitElement, PropertyValues, css, html } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { customElement } from '../utils/byfoCustomElement';
 import { buttonStyle } from '../styles';
-import { BYFOGameState } from 'byfo-utils';
+import { BYFOGameState } from '@byfo/utils';
 import { applicationRules } from '@byfo/themes';
 
 @customElement('byfo-writing-input')

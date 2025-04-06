@@ -9,7 +9,7 @@ import {
   GameStateError,
   RouteResult,
   StaticRoundInfo,
-} from 'byfo-utils';
+} from '@byfo/utils';
 import { choose } from 'lit/directives/choose.js';
 import { consume } from '@lit/context';
 import { firebaseContext, routeContext, storeContext } from '../context';
@@ -25,7 +25,7 @@ export class ByfoAppGameplay extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
     installRootStyles(this.shadowRoot!);
-    this.state = new BYFOGameState(this.firebase, this.route.arg, this.store.username);
+    this.state = new BYFOGameState(this.firebase, this.route.arg!, this.store.username!);
     this.state
       .initialize()
       .catch(e => {
@@ -71,7 +71,7 @@ export class ByfoAppGameplay extends LitElement {
   @consume({ context: firebaseContext })
   firebase!: BYFOFirebaseAdapter;
   @consume({ context: storeContext })
-  store!: BYFOStore;
+  store!: BYFOStore<ThemeId[]>;
   @consume({ context: routeContext })
   route!: RouteResult;
   state?: BYFOGameState;
@@ -85,7 +85,7 @@ export class ByfoAppGameplay extends LitElement {
 
   renderFrom() {
     const card = this.state?.recievedCard;
-    const cnode = card ? ByfoCard(card.content!, card.contentType, this.state!.from, 'left') : '';
+    const cnode = card ? ByfoCard(card.content!, card.contentType, this.state!.from!, 'left') : '';
     return html`${cnode}
       <section class="backdrop">
         <h4>Sending to: <strong>${this.state?.to}</strong></h4>

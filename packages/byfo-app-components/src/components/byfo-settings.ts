@@ -5,34 +5,28 @@ import { map } from 'lit/directives/map.js';
 import { html } from '../utils/byfoHtml';
 
 import buttonStyles from '../styles/button.style';
-import { applicationRules, CustomTheme, ThemeId, themes } from '@byfo/themes';
-import { BYFOStore } from 'byfo-utils';
+import { applicationRules, CustomTheme } from '@byfo/themes';
+import { BYFOStore } from '@byfo/utils';
 import { createRef, ref, Ref } from 'lit/directives/ref.js';
 import { ByfoIcon } from './functional/Icon';
 import { ByfoToggle, toggleStyles } from './functional/Toggle';
 
 @customElement('byfo-settings')
-export default class BYFOSettings extends LitElement {
-  @property() store?: BYFOStore;
+export default class BYFOSettings<T extends readonly string[]> extends LitElement {
+  @property() store!: BYFOStore<T>;
   get customTheme() {
-    return this.store?.customStyle;
+    return this.store.customStyle;
   }
 
-  #themeKeys?: ThemeId[];
+  #themeKeys?: T[number][];
 
   themeChanged(e: InputEvent) {
-    if (!this.store) {
-      return;
-    }
-    const themeid = (e.target as HTMLSelectElement).value as ThemeId;
+    const themeid = (e.target as HTMLSelectElement).value as T[number];
     this.store.setTheme(themeid);
-    themes[themeid].apply();
+    this.store.themes[themeid].apply();
   }
 
   resetCustomTheme() {
-    if (!this.store) {
-      return;
-    }
     this.customTheme!.reset();
     this.store.saveCustomStyle();
     this.#brightnessInput.value!.value = this.customTheme!.backgroundBrightness.toString();
@@ -40,9 +34,9 @@ export default class BYFOSettings extends LitElement {
     this.#blurInput.value!.value = this.customTheme!.backgroundBlur.toString();
   }
 
-  renderThemeOption(themeid: ThemeId) {
-    return html`<option value=${themeid} ?selected=${this.store!.theme === themeid}>
-      ${themes[themeid].displayName}
+  renderThemeOption(themeid: T[number]) {
+    return html`<option value=${themeid} ?selected=${this.store.theme === themeid}>
+      ${this.store.themes[themeid].displayName}
     </option>`;
   }
 
@@ -73,7 +67,7 @@ export default class BYFOSettings extends LitElement {
   #blurInput: Ref<HTMLInputElement> = createRef();
 
   renderSettings() {
-    this.#themeKeys ??= Object.keys(themes) as ThemeId[];
+    this.#themeKeys ??= Object.keys(this.store.themes);
     return html`<h2>Settings</h2>
       <section>
         <h3>Theme</h3>
@@ -191,6 +185,6 @@ export default class BYFOSettings extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'byfo-settings': BYFOSettings;
+    'byfo-settings': BYFOSettings<readonly string[]>;
   }
 }

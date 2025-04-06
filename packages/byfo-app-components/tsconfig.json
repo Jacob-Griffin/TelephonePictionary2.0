@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
-    "target": "ES2023",
+    "target": "ES2024",
     "experimentalDecorators": true,
     "useDefineForClassFields": false,
     "module": "ESNext",
-    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
 
     /* Bundler mode */
@@ -20,7 +20,12 @@
     "noUncheckedSideEffectImports": true,
 
     "outDir": "dist",
-    "declaration": true
+    "declaration": true,
+
+    "paths": {
+      "@byfo/utils": ["../byfo-app-utils/src/index.ts"],
+      "@byfo/utils/*": ["../byfo-app-utils/src/*.ts"]
+    }
   },
   "include": ["src"]
 }
