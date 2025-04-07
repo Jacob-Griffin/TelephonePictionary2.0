@@ -306,7 +306,8 @@ export class BYFOFirebaseAdapter {
    * @returns An object pairing gameids to statuses
    */
   async listGameStatus(): Promise<{ [id: number]: GameStatus }> {
-    return (await this.getRef('game-statuses')) ?? {};
+    const statuses = await this.getRef('game-statuses');
+    return statuses ?? {};
   }
 
   async createGame(user: string): Promise<string | false> {

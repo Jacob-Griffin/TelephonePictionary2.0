@@ -7,6 +7,7 @@ import { applicationRules } from '@byfo/themes';
 import { map } from 'lit/directives/map.js';
 import { when } from 'lit/directives/when.js';
 import { backdropStyle, buttonStyle, inputStyle } from '../styles/index';
+import { useKeystrokes } from '@byfo/utils';
 
 /**
  * Form element to handle inputs and validation
@@ -57,6 +58,10 @@ export class BYFOForm extends LitElement {
     }, 3000);
   };
 
+  handleKeys = useKeystrokes({
+    enter: () => this.submit(),
+  });
+
   submit() {
     if (Object.values(this.valid).every(v => v)) {
       try {
@@ -91,6 +96,7 @@ export class BYFOForm extends LitElement {
               <input
                 type="text"
                 @input=${this.handleInput}
+                @keydown=${this.handleKeys}
                 value=${field.initial}
                 id=${`field-${field.id}`}
                 class=${!field.label ? 'span' : ''}

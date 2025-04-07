@@ -1,11 +1,4 @@
-import {
-  setDoc,
-  doc,
-  getDocFromServer,
-  getFirestore,
-  type Firestore,
-  connectFirestoreEmulator,
-} from 'firebase/firestore';
+import { setDoc, doc, getDocFromServer, getFirestore, type Firestore } from 'firebase/firestore';
 import {
   ref as rtdbRef,
   get,
@@ -16,7 +9,6 @@ import {
   onDisconnect,
   DataSnapshot,
   type Database,
-  connectDatabaseEmulator,
 } from 'firebase/database';
 import {
   getDownloadURL,
@@ -24,7 +16,6 @@ import {
   uploadBytes,
   getStorage,
   type FirebaseStorage,
-  connectStorageEmulator,
 } from 'firebase/storage';
 import { FirebaseOptions, initializeApp } from 'firebase/app';
 import { BYFOConfig, config as defaultGameConfig } from './config';
@@ -83,12 +74,6 @@ export class BYFOFirebaseAdapter {
     this.connection.db = getFirestore(app);
     this.connection.rtdb = getDatabase(app);
     this.connection.storage = getStorage(app);
-    if (location.hostname === 'localhost') {
-      console.log('Connecting to firebase emulators');
-      connectDatabaseEmulator(this.connection.rtdb, '127.0.0.1', 9000);
-      connectFirestoreEmulator(this.connection.db, '127.0.0.1', 8080);
-      connectStorageEmulator(this.connection.storage, '127.0.0.1', 9199);
-    }
     this.gameConfig = Object.assign({}, defaultGameConfig, gameConfig);
     if (internetTime) {
       this.internetTime = true;

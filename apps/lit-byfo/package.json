@@ -4,19 +4,21 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "firebase emulators:start & vite && fg",
     "dev:lit": "firebase emulators:start & vite && fg",
+    "fb:login": "firebase login",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
     "@byfo/components": "workspace:^",
     "@byfo/themes": "workspace:^",
-    "@lit/context": "^1.1.4",
     "@byfo/utils": "workspace:^",
+    "@lit/context": "^1.1.4",
     "lit": "^3.2.1"
   },
   "devDependencies": {
+    "firebase-tools": "^14.1.0",
     "typescript": "~5.7.2",
     "vite": "^6.2.0"
   }
