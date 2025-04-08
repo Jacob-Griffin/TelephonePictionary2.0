@@ -70,12 +70,12 @@ export class BYFOFirebaseAdapter {
    *
    * @param firebaseConfig - The firebase config JSON object that the firebase console gives you
    */
-  constructor(firebaseConfig: FirebaseOptions, gameConfig?: Partial<BYFOConfig>) {
+  constructor(firebaseConfig: FirebaseOptions, gameConfig?: Partial<BYFOConfig>, forceEmulators?: boolean) {
     const app = initializeApp(firebaseConfig);
     this.connection.db = getFirestore(app);
     this.connection.rtdb = getDatabase(app);
     this.connection.storage = getStorage(app);
-    if (location.hostname === 'localhost') {
+    if (forceEmulators || location.hostname === 'localhost') {
       console.log('Connecting to firebase emulators');
       connectDatabaseEmulator(this.connection.rtdb, '127.0.0.1', 9000);
       connectFirestoreEmulator(this.connection.db, '127.0.0.1', 8080);

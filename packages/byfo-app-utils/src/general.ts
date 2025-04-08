@@ -1,5 +1,4 @@
 import { config as defaultGameConfig } from './config';
-import { Player } from './firebase';
 
 export const stopPropagation = (e: Event) => e.stopPropagation();
 
@@ -22,23 +21,6 @@ export function sortNameMap<T>(map: Record<string, T>): [string, T][] {
 }
 
 sortNameMap({ hi: 'hello', bye: 'goodbye' });
-
-/**
- * Calculates the amount of space to give the player names for list purposes.
- * Front-end heavy, reconsider this if changing the front end
- * @param players - a list of player objects
- * @returns The css width for the player section of a list, such as between rounds
- */
-export function calculatePlayerNameWidth(players: Player[]) {
-  let max = 0;
-  players.forEach(player => {
-    if (player.username?.length > max) {
-      max = player.username?.length;
-    }
-  });
-  const value = 50 + (40 * max) / 32;
-  return `${value}%`;
-}
 
 /**
  * Encodes the characters that are invalid in firebase paths as HTML escapes

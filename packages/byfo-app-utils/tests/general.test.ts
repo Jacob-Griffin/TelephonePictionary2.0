@@ -7,45 +7,11 @@ test('sortNames', () => {
   expect(src.sortNames(['a', 'B', 'c'])).toEqual(['a', 'B', 'c']);
 });
 
-test('sortNamesBy', () => {
-  expect(src.sortNamesBy([{ name: 'a' }, { name: 'c' }, { name: 'b' }], 'name')).toEqual([
-    { name: 'a' },
-    { name: 'b' },
-    { name: 'c' },
-  ]);
-  expect(
-    src.sortNamesBy(
-      [
-        { name: 'a', id: 'd' },
-        { name: 'c', id: 'e' },
-        { name: 'b', id: 'f' },
-      ],
-      'id',
-    ),
-  ).toEqual([
-    { name: 'a', id: 'd' },
-    { name: 'c', id: 'e' },
-    { name: 'b', id: 'f' },
-  ]);
-  expect(() =>
-    src.sortNamesBy(
-      [
-        { name: 'a', id: 'd' },
-        { name: 'c', id: 'e' },
-        { name: 'b', id: 2 },
-      ],
-      'id',
-    ),
-  ).toThrowError('Unexpected non-string value used as name');
-  expect(src.sortNamesBy([{ name: 'a' }, { name: 'C' }, { name: 'b' }], 'name')).toEqual([
-    { name: 'a' },
-    { name: 'b' },
-    { name: 'C' },
-  ]);
-  expect(src.sortNamesBy([{ name: 'a' }, { name: 'B' }, { name: 'c' }], 'name')).toEqual([
-    { name: 'a' },
-    { name: 'B' },
-    { name: 'c' },
+test('sortNameMap', () => {
+  expect(src.sortNameMap({ a: 5, b: 6, c: 7 })).toEqual([
+    ['a', 5],
+    ['b', 6],
+    ['c', 7],
   ]);
 });
 
@@ -59,33 +25,35 @@ test('encodePath', () => {
 });
 
 test('gameId', () => {
-  expect(src.validGameId('1')).toBe(true);
-  expect(src.validGameId('123456')).toBe(true);
-  expect(src.validGameId('1234567')).toBe(true);
-  expect(src.validGameId('12345678')).toBe(false);
-  expect(src.validGameId('1.234')).toBe(false);
-  expect(src.validGameId('123a')).toBe(false);
+  expect(src.isValidGameId('1')).toBe(true);
+  expect(src.isValidGameId('123456')).toBe(true);
+  expect(src.isValidGameId('1234567')).toBe(true);
+  expect(src.isValidGameId('12345678')).toBe(false);
+  expect(src.isValidGameId('1.234')).toBe(false);
+  expect(src.isValidGameId('123a')).toBe(false);
 });
 
 test('username', () => {
-  expect(src.validUsername('Jacob')).toBe(true);
-  expect(src.validUsername('Jacob#2')).toBe(true);
-  expect(src.validUsername('"Jacob"[a]')).toBe(true);
-  expect(src.validUsername('Jacob@^3.5.4')).toBe(true);
+  expect(src.isValidUsername('Jacob')).toBe(true);
+  expect(src.isValidUsername('Jacob#2')).toBe(true);
+  expect(src.isValidUsername('"Jacob"[a]')).toBe(true);
+  expect(src.isValidUsername('Jacob@^3.5.4')).toBe(true);
   expect(
-    src.validUsername(`Jacob
+    src.isValidUsername(`Jacob
 on
 multiple
 lines`),
   ).toBe(true);
-  expect(src.validUsername(``)).toBe(false);
-  expect(src.validUsername(`    `)).toBe(false);
-  expect(src.validUsername(`\t  `)).toBe(false);
-  expect(src.validUsername(`\n  `)).toBe(false);
-  expect(src.validUsername(`Jacob/slash`)).toMatch(/^Names cannot contain/);
-  expect(src.validUsername(`Jacob\\/slash`)).toMatch(/^Names cannot contain/);
-  expect(src.validUsername(`Jacob\\backslash`)).toMatch(/^Names cannot contain/);
-  expect(src.validUsername('a'.repeat(100))).toMatch(/^Names cannot exceed (\d+) characters. 100\/\1/);
+  expect(src.isValidUsername(``)).toBe(false);
+  expect(src.isValidUsername(`    `)).toBe(false);
+  expect(src.isValidUsername(`\t  `)).toBe(false);
+  expect(src.isValidUsername(`\n  `)).toBe(false);
+  expect(() => src.isValidUsername(`Jacob/slash`)).toThrowError(/^Names cannot contain/);
+  expect(() => src.isValidUsername(`Jacob\\/slash`)).toThrowError(/^Names cannot contain/);
+  expect(() => src.isValidUsername(`Jacob\\backslash`)).toThrowError(/^Names cannot contain/);
+  expect(() => src.isValidUsername('a'.repeat(100))).toThrowError(
+    /^Names cannot exceed (\d+) characters. 100\/\1/,
+  );
 });
 
 test('invalidCharacters', () => {

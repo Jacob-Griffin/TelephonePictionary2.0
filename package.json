@@ -17,7 +17,7 @@
     "version-sync": "syncpack fix-mismatches && pnpm install",
     "up:all": "syncpack update && syncpack fix-mismatches && pnpm install",
     "up:local": "node ./set-version.node.mjs && pnpm install",
-    "test:utils": "pnpm --filter 'byfo-utils' test"
+    "test:utils": "pnpm --filter '@byfo/utils' test"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
