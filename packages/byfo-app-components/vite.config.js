@@ -18,6 +18,7 @@ export default defineConfig(() => ({
   resolve: {
     alias: {
       '@byfo/utils': path.resolve(import.meta.dirname, '../byfo-app-utils/src/index.ts'),
+      '@byfo/themes': path.resolve(import.meta.dirname, '../byfo-app-themes/src/index.ts'),
     },
   },
 }));

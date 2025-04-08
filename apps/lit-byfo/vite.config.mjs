@@ -24,6 +24,7 @@ export default defineConfig(() => ({
   resolve: {
     alias: {
       '@byfo/utils': path.resolve(import.meta.dirname, '../../packages/byfo-app-utils/src/index.ts'),
+      '@byfo/themes': path.resolve(import.meta.dirname, '../../packages/byfo-app-themes/src/index.ts'),
       '@byfo/components/functional': path.resolve(
         import.meta.dirname,
         '../../packages/byfo-app-components/src/components/functional/index.ts',

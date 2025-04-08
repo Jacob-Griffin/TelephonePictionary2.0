@@ -24,6 +24,7 @@
     "paths": {
       "@byfo/utils": ["../../packages/byfo-app-utils/src/index.ts"],
       "@byfo/utils/*": ["../../packages/byfo-app-utils/src/*.ts"],
+      "@byfo/themes": ["../../packages/byfo-app-themes/src/index.ts"],
       "@byfo/components": ["../../packages/byfo-app-components/src/index.ts"],
       "@byfo/components/all": ["../../packages/byfo-app-components/src/components/index.ts"],
       "@byfo/components/functional": [

@@ -4,10 +4,10 @@ import { html } from './src/utils/byfoHtml';
 import { ByfoIcon } from './src/components/functional/Icon';
 import { ByfoMarkdown } from './src/components/functional/Markdown';
 import { ByfoCard, cardStyles } from './src/components/functional/Card';
-import { installRootStyles } from '@byfo/themes';
-import { BYFOStore } from '@byfo/utils/storage';
+import { installRootStyles, themes } from '@byfo/themes';
+import { BYFOStore } from '@byfo/utils';
 
-const store = new BYFOStore();
+const store = new BYFOStore(themes, 'dark');
 @customElement('byfo-testpage')
 export default class BYFOTestpage extends LitElement {
   connectedCallback(): void {
@@ -55,7 +55,10 @@ and <style>p{color:red}</style>`;
         <span slot="buttontext">Card Test</span>
         <div slot='content'>${ByfoCard('# Example of a card\nWith advanced [markdown](stuff) and *basic* **too**\n- test', 'text', 'Jacob', 'right')}<br><br>${ByfoCard('https://firebasestorage.googleapis.com/v0/b/new-telephone-pictionary.appspot.com/o/games%2F113706%2F1%2Fzchlurp.png?alt=media&token=b646a8f6-70af-44f6-9808-042bef984a7a', 'image', 'Jacob')}</div>
       </byfo-modal>
-      <div>${ByfoMarkdown(this.markdownContent, true)}<div>`;
+      <byfo-modal>
+        <span slot="buttontext">Markdown Test</span>
+        <div>${ByfoMarkdown(this.markdownContent, true)}<div>
+      </byfo-modal>`;
   }
 
   static styles = [

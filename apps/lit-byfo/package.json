@@ -1,11 +1,10 @@
 {
-  "name": "lit-byfo",
+  "name": "@byfo/app",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "firebase emulators:start & vite && fg",
-    "dev:lit": "firebase emulators:start & vite && fg",
     "fb:login": "firebase login",
     "build": "tsc && vite build",
     "preview": "vite preview"

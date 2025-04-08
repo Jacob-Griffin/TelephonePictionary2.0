@@ -13,9 +13,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "dev:components": "vite",
     "build": "tsc",
-    "dev:lit": "tsc --watch",
     "preview": "vite preview"
   },
   "dependencies": {

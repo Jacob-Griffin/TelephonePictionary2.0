@@ -15,16 +15,6 @@
       "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
-    },
-    "dev:components": {
-      "dependsOn": ["^build"],
-      "cache": false,
-      "persistent": true
-    },
-    "dev:lit": {
-      "dependsOn": ["^build"],
-      "cache": false,
-      "persistent": true
     }
   }
 }
