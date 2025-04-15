@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "firebase emulators:start & vite && fg",
     "fb:login": "firebase login",
+    "fb:start": "firebase emulators:start",
+    "test": "firebase emulators:start",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },

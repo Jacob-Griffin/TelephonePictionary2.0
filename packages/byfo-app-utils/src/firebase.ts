@@ -180,7 +180,7 @@ export class BYFOFirebaseAdapter {
    *
    * @internal
    */
-  generatePriority(taken?: Set<number>): number {
+  #generatePriority(taken?: Set<number>): number {
     let priority = Math.floor(Math.random() * Math.random() * 100000) % 997;
     while (taken && taken.has(priority)) {
       priority = Math.floor(Math.random() * Math.random() * 100000) % 997;
@@ -196,7 +196,7 @@ export class BYFOFirebaseAdapter {
    *
    * @internal
    */
-  getDefaultContent(type: 'text' | 'image'): string {
+  #getDefaultContent(type: 'text' | 'image'): string {
     if (type === 'image') {
       //As it stands, a "false" image will prompt the content to point to a single existing "no image" image
       //If we had a dynamic image generation, it would go here
@@ -223,6 +223,12 @@ export class BYFOFirebaseAdapter {
     const result: ActionResponse = {
       action: 'error',
     };
+    try {
+      isValidUsername(username);
+    } catch (e) {
+      result.detail = (e as Error).message;
+      return result;
+    }
     //If the game exists, read the data
     if (!gameStatus) {
       result.detail = 'Game does not exist';
@@ -267,7 +273,7 @@ export class BYFOFirebaseAdapter {
     }
 
     //If there are no issues, push in the new player
-    this.setRef(`players/${gameid}/${this.generatePriority(playerNumbers)}`, { username, status: 'ready' });
+    this.setRef(`players/${gameid}/${this.#generatePriority(playerNumbers)}`, { username, status: 'ready' });
 
     return { action: 'lobby', dest: 'lobby' };
   }
@@ -277,13 +283,14 @@ export class BYFOFirebaseAdapter {
    * @param gameid - The gameid you want to create
    * @param username - The host
    * @returns void
+   * @private
    */
-  async createLobby(gameid: number, username: string): Promise<void> {
+  async #createLobby(gameid: number, username: string): Promise<void> {
     const statusSet = this.setRef(`game-statuses/${gameid}`, {
       started: false,
       finished: false,
     });
-    const playerSet = this.setRef(`players/${gameid}/${this.generatePriority()}`, {
+    const playerSet = this.setRef(`players/${gameid}/${this.#generatePriority()}`, {
       username,
       status: 'ready',
     });
@@ -323,10 +330,6 @@ export class BYFOFirebaseAdapter {
     // Check which gameIds were/are in use via firestore, then generate one that's not there
     const usedIds = new Set<number>(Object.keys(gameStatuses).map(id => parseInt(id)));
 
-    const devGame = user.match(/Jacob-dev-test-(draw|write)/i);
-    if (devGame) {
-      return this.createDevGame(devGame, Math.max(...usedIds) + 1);
-    }
     // Try a random old game id
     let newId = Math.floor(Math.random() * 999999 + 1);
 
@@ -342,60 +345,10 @@ export class BYFOFirebaseAdapter {
     }
 
     //Send the request for this game to firestore
-    await this.createLobby(newId, user);
+    await this.#createLobby(newId, user);
 
     //Pass this id back so we can route the player to the lobby
     return `${newId}`;
-  }
-
-  /**
-   * Creates a special game for testing that's meant to never end and jump right into a certain state
-   * @param devMatch - a short array with the regex match data for a dev game username
-   * @param gameid - The game being created
-   * @returns The game id, if successful
-   */
-  async createDevGame([username, key]: string[], gameid: number): Promise<string | false> {
-    if (!/^draw|write$/i.test(key)) return false;
-    const isDraw = /^draw$/i.test(key);
-
-    try {
-      const promises: Promise<unknown>[] = [];
-
-      promises.push(
-        this.setRef(`game-statuses/${gameid}`, {
-          started: true,
-          finished: false,
-        }),
-      );
-
-      promises.push(
-        this.setRef(`players/${gameid}/${this.generatePriority()}`, { username, status: 'missing' }),
-      );
-
-      const round0 = {
-        roundnumber: isDraw ? 1 : 2,
-        endTime: -1,
-      };
-      promises.push(this.setRef(`game/${gameid}/round`, round0));
-
-      promises.push(
-        this.setRef(`game/${gameid}/staticRoundInfo`, {
-          lastRound: 1000,
-          roundLength: -1,
-        }),
-      );
-
-      promises.push(this.setRef(`game/${gameid}/players/${username}`, { to: username, from: username }));
-
-      promises.push(this.setRef(`game/${gameid}/finished/${username}`, -1));
-
-      await Promise.all(promises);
-    } catch (e) {
-      console.error(e);
-      return false;
-    }
-
-    return `${gameid}`;
   }
 
   /**
@@ -405,6 +358,20 @@ export class BYFOFirebaseAdapter {
    * @returns void
    */
   async beginGame(gameid: number, roundLength: number): Promise<void> {
+    if (roundLength !== Number.POSITIVE_INFINITY) {
+      if (roundLength < this.gameConfig.minRoundLength * 1000) {
+        throw new Error('Cannot start game: round length too short');
+      }
+      if (roundLength > this.gameConfig.maxRoundLength * 60000) {
+        throw new Error('Cannot start game: round length too long');
+      }
+    }
+
+    const playerList: Player[] = Object.values(await this.getWaitingPlayers(gameid));
+    if (playerList.length < this.gameConfig.minPlayers) {
+      throw new Error('Cannot start game: too few players');
+    }
+
     if (roundLength === Number.POSITIVE_INFINITY) roundLength = -1;
     //Set up the round variable at 0
     const round0 = {
@@ -415,7 +382,6 @@ export class BYFOFirebaseAdapter {
     this.setRef(`game/${gameid}/round`, round0);
 
     //Get the players
-    const playerList: Player[] = Object.values(await this.getWaitingPlayers(gameid));
     this.setRef(`game/${gameid}/staticRoundInfo`, {
       lastRound: playerList.length - 1,
       roundLength,
@@ -466,8 +432,14 @@ export class BYFOFirebaseAdapter {
       // If we got 2 submissions less than the minimum round length apart, they're surely in error
       return;
     }
+    const lastSubmittedRound = await this.fetchFinishedRound(gameid, name);
+    console.log(lastSubmittedRound);
+    if (round <= lastSubmittedRound) {
+      throw new Error();
+    }
     this.lastSubmission = Date.now();
     const contentType = round % 2 === 0 ? 'text' : 'image';
+    console.log(contentType);
     if (
       (contentType === 'text' && rawContent instanceof Blob) ||
       (contentType === 'image' && typeof rawContent === 'string')
@@ -475,7 +447,7 @@ export class BYFOFirebaseAdapter {
       if (!forced) {
         throw new Error();
       }
-      rawContent = this.getDefaultContent(contentType);
+      rawContent = this.#getDefaultContent(contentType);
     }
     if (
       contentType === 'text' &&
@@ -490,8 +462,11 @@ export class BYFOFirebaseAdapter {
     const content: string =
       rawContent instanceof Blob
         ? await this.uploadImage(gameid, name, round, rawContent)
-        : rawContent || this.getDefaultContent(contentType);
+        : rawContent || this.#getDefaultContent(contentType);
     const savedContent: RoundContent = { contentType, content };
+    if (contentType === 'image') {
+      console.log(content);
+    }
 
     await this.setRef(`game/${gameid}/stacks/${name}/${round}`, savedContent);
 
@@ -562,7 +537,7 @@ export class BYFOFirebaseAdapter {
    * @param round - the round number within the game
    * @returns Card data, or null if it doesn't exist
    */
-  async fetchCard(gameid: number, target: string, round: number) {
+  async fetchCard(gameid: number, target: string, round: number): Promise<RoundContent | null> {
     return this.getRef(`game/${gameid}/stacks/${encodePath(target)}/${round}`);
   }
 
@@ -610,41 +585,41 @@ export class BYFOFirebaseAdapter {
    * @param callback - The function to be called on watched update
    * @returns Unsubscribe function for the listener
    */
-  watchPath<T>(path: string, callback: (snapshot: T) => void) {
+  #watchPath<T>(path: string, callback: (snapshot: T) => void) {
     const pathRef = this.ref(path);
     return onValue(pathRef, v => callback(v.val()));
   }
 
   /**
    * Listens for a game to be started
-   * @extends {@link watchPath}
+   * @extends {@link #watchPath}
    */
   onGameStatusChange(gameid: number, callback: (snapshot: GameStatus) => unknown) {
-    return this.watchPath(`game-statuses/${gameid}`, callback);
+    return this.#watchPath(`game-statuses/${gameid}`, callback);
   }
 
   /**
    * Listens for changes to the player list in a lobby
-   * @extends {@link watchPath}
+   * @extends {@link #watchPath}
    */
   onPlayerListChange(gameid: number, callback: (snapshot: PlayerList) => unknown) {
-    return this.watchPath(`players/${gameid}`, callback);
+    return this.#watchPath(`players/${gameid}`, callback);
   }
 
   /**
    * Listens for new rounds
-   * @extends {@link watchPath}
+   * @extends {@link #watchPath }
    */
   onRoundChange(gameid: number, callback: (snapshot: RoundData) => unknown) {
-    return this.watchPath(`game/${gameid}/round`, callback);
+    return this.#watchPath(`game/${gameid}/round`, callback);
   }
 
   /**
    * Listens for changes to who's finished which rounds. Maps usernames to which round they have finished.
-   * @extends {@link watchPath}
+   * @extends {@link #watchPath}
    */
   onPlayerStatusChange(gameid: number, callback: (snapshot: Record<string, number>) => unknown) {
-    return this.watchPath(`game/${gameid}/finished`, callback);
+    return this.#watchPath(`game/${gameid}/finished`, callback);
   }
 
   /**
