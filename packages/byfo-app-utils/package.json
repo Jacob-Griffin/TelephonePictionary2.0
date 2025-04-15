@@ -17,10 +17,8 @@
     "build": "tsc && vite build",
     "test": "vitest"
   },
-  "peerDependencies": {
-    "@byfo/themes": "workspace:^"
-  },
   "dependencies": {
+    "@byfo/themes": "workspace:^",
     "firebase": "11.2.0"
   },
   "devDependencies": {

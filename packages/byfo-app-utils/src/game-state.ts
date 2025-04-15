@@ -123,7 +123,11 @@ export class BYFOGameState {
       this.state = this.round % 2 === 0 ? 'writing' : 'drawing';
     }
     if (this.round > 0 && this.state !== 'waiting') {
-      this.recievedCard = await this.#firebase.fetchCard(this.gameid, this.from!, this.round - 1);
+      this.recievedCard = (await this.#firebase.fetchCard(
+        this.gameid,
+        this.from!,
+        this.round - 1,
+      )) as RoundContent;
     }
   }
 
