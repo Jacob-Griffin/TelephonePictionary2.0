@@ -18,14 +18,25 @@ export class ByfoAppPage extends LitElement {
     window.addEventListener('popstate', () => this.#fetchRoute(true));
   }
 
-  #redirect(route: string, arg?: string, fromWindow?: boolean) {
+  #renderQuery(query?: Record<string, string>) {
+    if (!query) {
+      return '';
+    }
+    let res = '?';
+    for (const key in query) {
+      res += encodeURIComponent(`${key}=${query[key]}`);
+    }
+    return res;
+  }
+
+  #redirect(route: string, arg?: string, query?: Record<string, string>, fromWindow?: boolean) {
     const routeObj = routes[route];
     if (!routeObj) {
       return;
     }
-    this.route = { route, arg };
+    this.route = { route, arg, query };
     if (!fromWindow) {
-      window.history.pushState({}, '', routeObj.renderUrl(arg));
+      window.history.pushState({}, '', routeObj.renderUrl(arg) + this.#renderQuery(query));
     }
     if (routeObj.title) {
       document.title = routeObj.title + ' | Blow Your Face Off';
@@ -42,7 +53,8 @@ export class ByfoAppPage extends LitElement {
       }
     }
     if (route && 'route' in route) {
-      this.#redirect(route.route, route.arg, fromWindow);
+      const query = this.#parseQueryString(window.location.search);
+      this.#redirect(route.route, route.arg, query, fromWindow);
     } else {
       const [defaultRoute] = Object.entries(routes).find(([_, value]) => value.default) ?? ['home'];
       this.route = { route: defaultRoute, arg: undefined };
@@ -50,8 +62,18 @@ export class ByfoAppPage extends LitElement {
     }
   }
 
+  #parseQueryString(search: string): Record<string, string> {
+    const entries = search.replace(/^\?/, '').split('&');
+    const result: Record<string, string> = {};
+    for (const entry of entries) {
+      const [key, value] = entry.split('=');
+      result[key] = decodeURIComponent(value);
+    }
+    return result;
+  }
+
   handleRedirect = ({ detail }: CustomEvent<RouteResult>) => {
-    this.#redirect(detail.route, detail.arg);
+    this.#redirect(detail.route, detail.arg, detail.query);
   };
 
   @provide({ context: storeContext }) store = new BYFOStore<ThemeId[]>(themes, 'classic');

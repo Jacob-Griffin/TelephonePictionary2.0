@@ -3,6 +3,7 @@ import type { TemplateResult } from 'lit';
 export type RouteResult = {
   route: string;
   arg?: string;
+  query?: Record<string, string>;
 };
 
 export interface RouteDefinition {

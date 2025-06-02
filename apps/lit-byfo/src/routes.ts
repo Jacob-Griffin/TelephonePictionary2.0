@@ -61,7 +61,7 @@ export const routes: RouteList = {
   review: {
     match: p => {
       const r = p.match(/^\/review\/(\d{1,7})\/?$/);
-      return r ? { route: 'review', arg: r[1] } : undefined;
+      return r ? { route: 'review', arg: r[1], query: { stack: r[2] } } : undefined;
     },
     render: () => {
       if (!window.customElements.get('byfo-app-review')) {

@@ -37,9 +37,10 @@ export class ByfoAppGameplay extends LitElement {
     this.state?.on('currentTimeRemaining', t => this.handleTime(t));
     this.state?.on('state', newState => {
       if (newState === 'finished') {
+        const username = this.store.username!;
         this.store?.setGameid(null);
         this.store?.setUsername(null);
-        emitRedirect(this, { route: 'review', arg: this.route.arg });
+        emitRedirect(this, { route: 'review', arg: this.route.arg, query: { stack: username } });
         return;
       }
       this.requestUpdate();
