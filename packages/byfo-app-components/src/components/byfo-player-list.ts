@@ -80,6 +80,9 @@ export default class BYFOPlayerList extends LitElement {
         max-width: min(30rem, 100%);
         gap: 0.5rem;
       }
+      :host(.backdrop) {
+        padding-block: 1rem;
+      }
       p {
         margin: 0;
         height: fit-content;
@@ -92,7 +95,7 @@ export default class BYFOPlayerList extends LitElement {
         grid-template-columns: max-content;
         grid-auto-flow: row;
         grid-auto-rows: 2.25rem;
-        :not(.with-status) > p {
+        &:not(.with-status) > p {
           text-align: center;
         }
       }

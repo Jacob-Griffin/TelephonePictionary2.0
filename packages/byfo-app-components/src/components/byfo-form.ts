@@ -132,15 +132,18 @@ export class BYFOForm extends LitElement {
         width: 30rem;
         max-width: 100%;
         display: grid;
-        grid-template-columns: 1fr 3fr;
+        grid-template-columns: 1fr 6fr;
         grid-auto-rows: 2.5rem;
         align-items: center;
         justify-content: center;
         column-gap: var(--form-column-gap, 1rem);
         row-gap: var(--form-row-gap, 1rem);
+        p {
+          font-size: 1.25rem;
+        }
       }
       p.error {
-        --error-height: calc(-1 * (var(--form-row-gap) / 2));
+        --error-height: calc(-1 * (var(--form-row-gap, 1rem) / 2));
         margin-block: var(--error-height);
       }
       input.span {
