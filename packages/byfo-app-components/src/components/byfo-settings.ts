@@ -71,7 +71,10 @@ export default class BYFOSettings<T extends readonly string[]> extends LitElemen
       return;
     }
     if (this.customTheme.backgroundType === 'image' && inputEl.type === 'file') {
-      readImageData(e).then(data => (this.customTheme.customBackground = data));
+      readImageData(e).then(data => {
+        this.customTheme.customBackground = data;
+        this.store?.saveCustomStyle();
+      });
     }
   }
 
@@ -100,17 +103,13 @@ export default class BYFOSettings<T extends readonly string[]> extends LitElemen
           <option value="image">Image</option>
           <option value="color">Color</option>
         </select>
-        ${choose(this.customTheme.backgroundType.toLowerCase(), [
+        ${choose(this.customTheme.backgroundType, [
           ['none', () => html``],
           [
             'image',
             () =>
               html`<h4>Background Image</h4>
-                <input
-                  type="file"
-                  @input=${this.handleBackgroundChange}
-                  .value=${this.customTheme.customBackground}
-                />`,
+                <input type="file" @change=${this.handleBackgroundChange} />`,
           ],
           [
             'color',

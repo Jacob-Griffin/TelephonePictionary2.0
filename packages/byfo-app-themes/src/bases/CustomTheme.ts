@@ -94,10 +94,9 @@ export class CustomTheme extends CustomThemeBase {
         backgroundString = `--byfo-custom-background-color:#${this.customBackground};`;
         break;
       case 'image':
-        backgroundString = `--byfo-custom-background-image:${this.customBackground};`;
+        backgroundString = `--byfo-custom-background-image:url("${this.customBackground ?? ''}");`;
         break;
     }
-    console.log(backgroundString);
     return `:root { 
     --byfo-custom-brightness: ${this.#backgroundBrightness};
     --byfo-custom-saturation: ${this.#backgroundSaturation};

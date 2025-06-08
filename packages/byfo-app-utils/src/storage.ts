@@ -59,6 +59,7 @@ export class BYFOStore<T extends readonly string[]> {
     }
     if (base.backgroundType === 'image') {
       base.customBackground = await loadCustomImage(this.#idb!);
+      console.log(base.customBackground);
     }
   }
   //#endregion theme
@@ -179,12 +180,13 @@ export class BYFOStore<T extends readonly string[]> {
 }
 
 async function openIndexedDB(): Promise<IDBDatabase | undefined> {
-  const req = indexedDB.open('byfo-custom-file-data');
+  const req = indexedDB.open('byfo-custom-file-data', 2);
   await new Promise<void>(res => {
     const finish = (e: Event) => {
       req.removeEventListener('success', finish);
       req.removeEventListener('error', finish);
       req.removeEventListener('blocked', finish);
+      req.removeEventListener('upgradeneeded', finish);
       if (e.type === 'upgradeneeded') {
         upgradeDB(e as IDBVersionChangeEvent);
       }
@@ -193,6 +195,7 @@ async function openIndexedDB(): Promise<IDBDatabase | undefined> {
     req.addEventListener('success', finish);
     req.addEventListener('error', finish);
     req.addEventListener('blocked', finish);
+    req.addEventListener('upgradeneeded', finish);
   });
   return req.result;
 }
@@ -217,9 +220,35 @@ async function loadCustomImage(db: IDBDatabase): Promise<string | undefined> {
   });
 }
 
-async function saveCustomImage(_data: string, _db: IDBDatabase): Promise<void> {}
+async function saveCustomImage(data: string, db: IDBDatabase): Promise<void> {
+  const t = db.transaction('custom-data', 'readwrite');
+  const s = t.objectStore('custom-data');
+  const req = s.put(data, 'custom-image');
+  return new Promise<void>(res => {
+    const finish = () => {
+      req.removeEventListener('success', finish);
+      req.removeEventListener('error', finish);
+      res();
+    };
+    req.addEventListener('success', finish);
+    req.addEventListener('error', finish);
+  });
+}
 
-export async function readImageData(event: InputEvent): Promise<string> {
-  console.log(event);
-  return '';
+export async function readImageData(event: InputEvent): Promise<string | undefined> {
+  const files = (event.target as HTMLInputElement).files;
+  if (!files || files.length === 0) {
+    return '';
+  }
+  const reader = new FileReader();
+  const { promise, resolve } = Promise.withResolvers<string | undefined>();
+  reader.addEventListener('loadend', () => {
+    if (typeof reader.result === 'string') {
+      resolve(reader.result);
+      return;
+    }
+    resolve(undefined);
+  });
+  reader.readAsDataURL(files[0]);
+  return promise;
 }
