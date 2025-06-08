@@ -1,23 +1,43 @@
 import { installRootStyles } from './applicationRules';
 import { CustomThemeBase } from './CustomThemeBase';
 
+export type CustomBackgroundType = 'none' | 'image' | 'color';
 export class CustomTheme extends CustomThemeBase {
   #backgroundBrightness: number;
   #backgroundSaturation: number;
   #backgroundBlur: number;
-  constructor({ backgroundBrightness, backgroundSaturation, backgroundBlur }: Partial<CustomTheme> = {}) {
+  #backgroundType: CustomBackgroundType;
+  #customBackground?: string;
+  constructor({
+    backgroundBrightness,
+    backgroundSaturation,
+    backgroundBlur,
+    backgroundType,
+    customBackground: customColor,
+  }: Partial<CustomTheme> = {}) {
     super();
     this.#backgroundBlur = backgroundBlur ?? CustomThemeBase.defaultBlur;
     this.#backgroundBrightness = backgroundBrightness ?? CustomThemeBase.defaultBrightness;
     this.#backgroundSaturation = backgroundSaturation ?? CustomThemeBase.defaultSaturation;
+    this.#backgroundType = backgroundType ?? 'none';
+    this.#customBackground = customColor;
   }
   static fromJsonString(v?: string) {
     const json = v ? JSON.parse(v) : {};
     return new CustomTheme(json);
   }
   toJsonString(): string {
-    const { backgroundBrightness, backgroundSaturation, backgroundBlur } = this;
-    return JSON.stringify({ backgroundBrightness, backgroundSaturation, backgroundBlur });
+    const { backgroundBrightness, backgroundSaturation, backgroundBlur, backgroundType } = this;
+    const obj: Partial<CustomTheme> = {
+      backgroundBrightness,
+      backgroundSaturation,
+      backgroundBlur,
+      backgroundType,
+    };
+    if (backgroundType === 'color') {
+      obj.customBackground = this.customBackground;
+    }
+    return JSON.stringify(obj);
   }
 
   reset() {
@@ -51,11 +71,38 @@ export class CustomTheme extends CustomThemeBase {
     return this.#backgroundBlur;
   }
 
+  set backgroundType(v: CustomBackgroundType) {
+    this.#backgroundType = v ?? 'none';
+    this.refreshStylesheet();
+  }
+  get backgroundType() {
+    return this.#backgroundType;
+  }
+
+  set customBackground(v: string | undefined) {
+    this.#customBackground = v;
+    this.refreshStylesheet();
+  }
+  get customBackground() {
+    return this.#customBackground;
+  }
+
   toString(): string {
+    let backgroundString = '';
+    switch (this.backgroundType) {
+      case 'color':
+        backgroundString = `--byfo-custom-background-color:#${this.customBackground};`;
+        break;
+      case 'image':
+        backgroundString = `--byfo-custom-background-image:${this.customBackground};`;
+        break;
+    }
+    console.log(backgroundString);
     return `:root { 
     --byfo-custom-brightness: ${this.#backgroundBrightness};
     --byfo-custom-saturation: ${this.#backgroundSaturation};
     --byfo-custom-blur: ${this.#backgroundBlur}px;
+    ${backgroundString}
     }`;
   }
 

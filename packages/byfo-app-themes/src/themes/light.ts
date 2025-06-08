@@ -3,9 +3,3 @@ import jsonLight from './builtin/light';
 export const light = new Theme(jsonLight);
 
 export default light;
-
-declare global {
-  interface ThemeMap {
-    light: typeof light;
-  }
-}

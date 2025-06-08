@@ -20,7 +20,7 @@
     "./css/*": "./src/globals/css/*.css"
   },
   "scripts": {
-    "build": "stencil build",
+    "build": "echo",
     "generate": "stencil generate"
   },
   "dependencies": {

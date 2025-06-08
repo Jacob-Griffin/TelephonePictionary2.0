@@ -5,11 +5,12 @@ import { map } from 'lit/directives/map.js';
 import { html } from '../utils/byfoHtml';
 
 import buttonStyles from '../styles/button.style';
-import { applicationRules, CustomTheme } from '@byfo/themes';
-import { BYFOStore } from '@byfo/utils';
+import { applicationRules, CustomBackgroundType, CustomTheme } from '@byfo/themes';
+import { BYFOStore, readImageData } from '@byfo/utils';
 import { createRef, ref, Ref } from 'lit/directives/ref.js';
 import { ByfoIcon } from './functional/Icon';
 import { ByfoToggle, toggleStyles } from './functional/Toggle';
+import { choose } from 'lit/directives/choose.js';
 
 @customElement('byfo-settings')
 export default class BYFOSettings<T extends readonly string[]> extends LitElement {
@@ -47,19 +48,38 @@ export default class BYFOSettings<T extends readonly string[]> extends LitElemen
     const slider = e.target as HTMLInputElement;
     switch (slider) {
       case this.#brightnessInput.value: {
-        this.store.customStyle.backgroundBrightness = parseFloat(slider.value);
+        this.customTheme.backgroundBrightness = parseFloat(slider.value);
         break;
       }
       case this.#saturationInput.value: {
-        this.store.customStyle.backgroundSaturation = parseFloat(slider.value);
+        this.customTheme.backgroundSaturation = parseFloat(slider.value);
         break;
       }
       case this.#blurInput.value: {
-        this.store.customStyle.backgroundBlur = parseFloat(slider.value);
+        this.customTheme.backgroundBlur = parseFloat(slider.value);
         break;
       }
     }
     this.store?.saveCustomStyle();
+  }
+
+  handleBackgroundChange(e: InputEvent) {
+    const inputEl = e.target as HTMLInputElement;
+    if (this.customTheme.backgroundType === 'color' && inputEl.type === 'text') {
+      this.customTheme.customBackground = inputEl.value;
+      this.store?.saveCustomStyle();
+      return;
+    }
+    if (this.customTheme.backgroundType === 'image' && inputEl.type === 'file') {
+      readImageData(e).then(data => (this.customTheme.customBackground = data));
+    }
+  }
+
+  handleBackgroundTypeChange(e: InputEvent) {
+    const type = (e.target as HTMLSelectElement).value as CustomBackgroundType;
+    this.customTheme.customBackground = '';
+    this.customTheme.backgroundType = type;
+    this.requestUpdate();
   }
 
   #brightnessInput: Ref<HTMLInputElement> = createRef();
@@ -74,7 +94,36 @@ export default class BYFOSettings<T extends readonly string[]> extends LitElemen
         <select @input=${this.themeChanged}>
           ${map(this.#themeKeys, theme => this.renderThemeOption(theme))}
         </select>
-        <h3>Background Customization</h3>
+        <h3>Custom Background</h3>
+        <select @input=${this.handleBackgroundTypeChange} .value=${this.customTheme.backgroundType}>
+          <option value="none">None</option>
+          <option value="image">Image</option>
+          <option value="color">Color</option>
+        </select>
+        ${choose(this.customTheme.backgroundType.toLowerCase(), [
+          ['none', () => html``],
+          [
+            'image',
+            () =>
+              html`<h4>Background Image</h4>
+                <input
+                  type="file"
+                  @input=${this.handleBackgroundChange}
+                  .value=${this.customTheme.customBackground}
+                />`,
+          ],
+          [
+            'color',
+            () =>
+              html`<h4>Background Color</h4>
+                <input
+                  type="text"
+                  @input=${this.handleBackgroundChange}
+                  .value=${this.customTheme.customBackground}
+                />`,
+          ],
+        ])}
+        <h3>Background Tweaks</h3>
         <button @click=${this.resetCustomTheme}>Reset Background</button>
         <h4>Background Brightness</h4>
         <input

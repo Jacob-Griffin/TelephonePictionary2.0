@@ -42,9 +42,3 @@ export const candyvomit = new Theme({
 });
 
 export default candyvomit;
-
-declare global {
-  interface ThemeMap {
-    candyvomit: typeof candyvomit;
-  }
-}

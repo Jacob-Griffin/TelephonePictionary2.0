@@ -162,6 +162,7 @@ declare global {
   interface HTMLElementTagNameMap {
     'byfo-app-page': ByfoAppPage;
   }
+  type ThemeId = keyof typeof themes;
 }
 
 declare const __FIREBASE_CONFIG__: ConstructorParameters<typeof BYFOFirebaseAdapter>[0];

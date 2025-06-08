@@ -42,9 +42,3 @@ export const classic = new Theme({
 });
 
 export default classic;
-
-declare global {
-  interface ThemeMap {
-    classic: typeof classic;
-  }
-}

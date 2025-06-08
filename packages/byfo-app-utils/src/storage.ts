@@ -9,10 +9,10 @@ export interface RejoinData {
 export class BYFOStore<T extends readonly string[]> {
   constructor(themes: Record<T[number], Theme>, defaultTheme: T[number]) {
     this.readFromWindow();
+    this.loadCustomStyle().then(() => this.customStyle.install());
     this.themes = themes;
     this.defaultTheme = defaultTheme;
     this.theme = (localStorage.getItem('theme') as T[number]) ?? defaultTheme;
-    this.customStyle.install();
     this.themeController.install();
     this.themeController.apply();
   }
@@ -33,10 +33,33 @@ export class BYFOStore<T extends readonly string[]> {
   get themeController() {
     return this.themes[this.theme];
   }
-  customStyle: CustomTheme = CustomTheme.fromJsonString(localStorage.getItem('customStyle') ?? undefined);
+
+  #idb?: IDBDatabase;
+  canSetCustomImage: boolean = false;
+  customStyle!: CustomTheme;
   saveCustomStyle() {
+    if (!this.#idb && this.customStyle.backgroundType === 'image') {
+      this.customStyle.backgroundType = 'none';
+    }
     // Not really a setter since custom style needs to be accessed for it to be responsive
     localStorage.setItem('customStyle', this.customStyle.toJsonString());
+    if (this.customStyle.backgroundType === 'image' && this.customStyle.customBackground) {
+      saveCustomImage(this.customStyle.customBackground, this.#idb!);
+    }
+  }
+
+  async loadCustomStyle() {
+    const base = CustomTheme.fromJsonString(localStorage.getItem('customStyle') ?? undefined);
+    this.customStyle = base;
+    this.#idb = await openIndexedDB();
+    if (this.#idb) {
+      this.canSetCustomImage = true;
+    } else {
+      this.saveCustomStyle();
+    }
+    if (base.backgroundType === 'image') {
+      base.customBackground = await loadCustomImage(this.#idb!);
+    }
   }
   //#endregion theme
 
@@ -153,4 +176,50 @@ export class BYFOStore<T extends readonly string[]> {
     this.setRejoinNumber(null);
   }
   //#endregion gamedata
+}
+
+async function openIndexedDB(): Promise<IDBDatabase | undefined> {
+  const req = indexedDB.open('byfo-custom-file-data');
+  await new Promise<void>(res => {
+    const finish = (e: Event) => {
+      req.removeEventListener('success', finish);
+      req.removeEventListener('error', finish);
+      req.removeEventListener('blocked', finish);
+      if (e.type === 'upgradeneeded') {
+        upgradeDB(e as IDBVersionChangeEvent);
+      }
+      res();
+    };
+    req.addEventListener('success', finish);
+    req.addEventListener('error', finish);
+    req.addEventListener('blocked', finish);
+  });
+  return req.result;
+}
+
+async function upgradeDB(e: IDBVersionChangeEvent) {
+  const db = (e.target as IDBOpenDBRequest).result;
+  db.createObjectStore('custom-data');
+}
+
+async function loadCustomImage(db: IDBDatabase): Promise<string | undefined> {
+  const t = db.transaction('custom-data');
+  const s = t.objectStore('custom-data');
+  const req = s.get('custom-image');
+  return new Promise<string | undefined>(res => {
+    const finish = () => {
+      req.removeEventListener('success', finish);
+      req.removeEventListener('error', finish);
+      res(req.result ?? undefined);
+    };
+    req.addEventListener('success', finish);
+    req.addEventListener('error', finish);
+  });
+}
+
+async function saveCustomImage(_data: string, _db: IDBDatabase): Promise<void> {}
+
+export async function readImageData(event: InputEvent): Promise<string> {
+  console.log(event);
+  return '';
 }

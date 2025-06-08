@@ -10,8 +10,8 @@ const css = (strings: TemplateStringsArray, ...values: unknown[]) =>
 export default css`
   :root {
     --byfo-theme-styles: #fff;
-    background-color: var(--byfo-color-background);
-    background-image: var(--byfo-image-background);
+    background-color: var(--byfo-custom-background-color, var(--byfo-color-background));
+    background-image: var(--byfo-custom-background-color, var(--byfo-image-background));
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;

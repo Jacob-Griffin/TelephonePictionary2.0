@@ -1,4 +1,5 @@
 import type { Theme } from './Theme';
+import { ThemeColors, ThemeHoverColors, ThemeImages, ThemeTextColors } from './ThemeSpec';
 /**
  * Outputs the css *rules* for a given theme. No selector is generated
  * @param context the Theme object

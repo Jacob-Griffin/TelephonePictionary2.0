@@ -1,4 +1,6 @@
+import { ThemeId } from '../themes';
 import { installRootStyles } from './applicationRules';
+import { ThemeColors, ThemeHoverColors, ThemeImages, ThemeTextColors } from './ThemeSpec';
 import { themeToString } from './themeToString';
 
 export class Theme {
