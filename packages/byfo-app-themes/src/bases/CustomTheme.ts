@@ -27,16 +27,15 @@ export class CustomTheme extends CustomThemeBase {
     return new CustomTheme(json);
   }
   toJsonString(): string {
-    const { backgroundBrightness, backgroundSaturation, backgroundBlur, backgroundType } = this;
+    const { backgroundBrightness, backgroundSaturation, backgroundBlur, backgroundType, customBackground } =
+      this;
     const obj: Partial<CustomTheme> = {
       backgroundBrightness,
       backgroundSaturation,
       backgroundBlur,
       backgroundType,
+      customBackground,
     };
-    if (backgroundType === 'color') {
-      obj.customBackground = this.customBackground;
-    }
     return JSON.stringify(obj);
   }
 

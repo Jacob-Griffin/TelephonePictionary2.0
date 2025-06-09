@@ -6,7 +6,7 @@ import { html } from '../utils/byfoHtml';
 
 import buttonStyles from '../styles/button.style';
 import { applicationRules, CustomBackgroundType, CustomTheme } from '@byfo/themes';
-import { BYFOStore, readImageData } from '@byfo/utils';
+import { BYFOStore } from '@byfo/utils';
 import { createRef, ref, Ref } from 'lit/directives/ref.js';
 import { ByfoIcon } from './functional/Icon';
 import { ByfoToggle, toggleStyles } from './functional/Toggle';
@@ -71,8 +71,7 @@ export default class BYFOSettings<T extends readonly string[]> extends LitElemen
       return;
     }
     if (this.customTheme.backgroundType === 'image' && inputEl.type === 'file') {
-      readImageData(e).then(data => {
-        this.customTheme.customBackground = data;
+      this.store.readImageData(e).then(() => {
         this.store?.saveCustomStyle();
       });
     }
